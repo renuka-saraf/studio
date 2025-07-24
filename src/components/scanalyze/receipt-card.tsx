@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -63,11 +64,25 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
       setIsLoading(false);
     }
   };
+  
+  const getFormattedAmount = () => {
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: receipt.currency || "USD",
+      }).format(receipt.amount);
+    } catch (e) {
+      console.warn(`Invalid currency code: ${receipt.currency}. Defaulting to USD display.`);
+      // Fallback for invalid currency codes
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        currencyDisplay: "code"
+      }).format(receipt.amount).replace("USD", receipt.currency || "");
+    }
+  };
 
-  const formattedAmount = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: receipt.currency || "USD",
-  }).format(receipt.amount);
+  const formattedAmount = getFormattedAmount();
 
   return (
     <>
