@@ -66,7 +66,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
 
   const formattedAmount = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: receipt.currency || "USD",
   }).format(receipt.amount);
 
   return (

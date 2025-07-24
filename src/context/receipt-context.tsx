@@ -9,6 +9,7 @@ export interface Receipt {
   text: string;
   category: 'food' | 'fashion' | 'travel' | 'other';
   amount: number;
+  currency: string;
 }
 
 interface ReceiptContextType {

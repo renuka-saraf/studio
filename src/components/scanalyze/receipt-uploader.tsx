@@ -92,8 +92,8 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
           imageDataUri: dataUri,
           text: receiptText,
           category: result.category,
-          // In a real app, you'd extract this from the receipt text.
-          amount: parseFloat((Math.random() * (200 - 10) + 10).toFixed(2)),
+          amount: result.amount,
+          currency: result.currency,
         };
         
         addReceipt(newReceipt);
@@ -228,5 +228,3 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
     </>
   );
 }
-
-    
