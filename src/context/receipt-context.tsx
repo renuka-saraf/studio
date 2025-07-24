@@ -3,6 +3,7 @@
 
 import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from 'react';
 import { type AnalyzeExpensesOutput } from '@/ai/flows/expense-analysis-dashboard';
+import { sendAuthPin } from '@/ai/flows/send-auth-pin';
 
 export interface Receipt {
   id: string;
@@ -30,6 +31,9 @@ interface ReceiptContextType {
 
 const ReceiptContext = createContext<ReceiptContextType | undefined>(undefined);
 
+// In a real app, this would be stored in a database, not in memory.
+let simulatedPinStore: { [email: string]: string } = {};
+
 export function ReceiptProvider({ children }: { children: ReactNode }) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [monthlyLimit, setMonthlyLimit] = useState<number | null>(1000);
@@ -43,18 +47,31 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   };
   
   const sendPin = async (email: string) => {
-    // In a real app, you'd call an AI flow or backend service to send a PIN.
-    // For this prototype, we'll just log it and move to the PIN entry step.
-    console.log(`Simulating sending PIN to ${email}. In a real app, an email would be sent.`);
-    setUserEmail(email);
-    return true;
+    // This now calls our AI flow to simulate sending a PIN.
+    console.log(`Requesting PIN for ${email}...`);
+    try {
+      const result = await sendAuthPin({ email });
+      if (result.success) {
+        // In a real app, the PIN would be sent via email, not returned here.
+        // We store it in our simulated store for verification.
+        simulatedPinStore[email] = result.pincode;
+        console.log(`PIN for ${email} is ${result.pincode} (for simulation purposes).`);
+        setUserEmail(email);
+        return true;
+      }
+    } catch (error) {
+        console.error("Error sending PIN:", error);
+    }
+    return false;
   };
 
   const login = (email: string, pin: string) => {
-    // In a real app, you would verify the PIN against a backend service.
-    // For this prototype, we'll accept any PIN for the given email.
-    if (userEmail === email && pin.length > 0) {
+    // In a real app, you would call a backend service to verify the PIN.
+    // For this prototype, we check against our simulated in-memory store.
+    const expectedPin = simulatedPinStore[email];
+    if (userEmail === email && expectedPin && expectedPin === pin) {
       setIsAuthenticated(true);
+      delete simulatedPinStore[email]; // PIN is used, so we delete it.
       return true;
     }
     return false;
