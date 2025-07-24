@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect, useTransition } from 'react';
@@ -91,7 +92,7 @@ export function Chatbot() {
       try {
         const receiptData = JSON.stringify(receipts.map(r => ({
           id: r.id,
-          date: new Date(r.id).toLocaleString(),
+          date: new Date(parseInt(r.id)).toLocaleString(),
           category: r.category,
           amount: r.amount,
           currency: r.currency,

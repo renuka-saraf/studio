@@ -51,7 +51,7 @@ function PassCard({ receipt }: { receipt: Receipt }) {
                     <p className="text-lg font-bold flex-shrink-0 ml-4">{formattedAmount}</p>
                 </div>
                 <p className="text-sm text-right mt-2">
-                    {new Date(receipt.id).toLocaleString()}
+                    {new Date(parseInt(receipt.id)).toLocaleString()}
                 </p>
             </div>
         </div>

@@ -107,7 +107,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
             <p className="text-xl font-bold text-primary">{formattedAmount}</p>
           </div>
           <p className="text-sm text-muted-foreground mt-2 truncate">
-            {new Date(receipt.id).toLocaleString()}
+            {new Date(parseInt(receipt.id)).toLocaleString()}
           </p>
         </CardContent>
         {receipt.category === "food" && (

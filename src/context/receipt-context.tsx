@@ -1,10 +1,8 @@
 
 "use client";
 
-import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction, useEffect } from 'react';
+import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from 'react';
 import { type AnalyzeExpensesOutput } from '@/ai/flows/expense-analysis-dashboard';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 
 export interface Receipt {
   id: string;
@@ -28,57 +26,15 @@ interface ReceiptContextType {
 
 const ReceiptContext = createContext<ReceiptContextType | undefined>(undefined);
 
-const SETTINGS_DOC_ID = 'user-settings';
-
 export function ReceiptProvider({ children }: { children: ReactNode }) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
-  const [monthlyLimit, setMonthlyLimitState] = useState<number | null>(null);
+  const [monthlyLimit, setMonthlyLimit] = useState<number | null>(1000);
   const [dashboardAnalysis, setDashboardAnalysis] = useState<AnalyzeExpensesOutput | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch receipts
-        const querySnapshot = await getDocs(collection(db, 'receipts'));
-        const receiptsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Receipt));
-        setReceipts(receiptsData);
-
-        // Fetch monthly limit
-        const settingsDoc = await getDoc(doc(db, 'settings', SETTINGS_DOC_ID));
-        if (settingsDoc.exists()) {
-          setMonthlyLimitState(settingsDoc.data().monthlyLimit);
-        } else {
-          setMonthlyLimitState(1000); // Default value
-        }
-      } catch (error) {
-        console.error("Error fetching data from Firestore:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const addReceipt = async (receiptData: Omit<Receipt, 'id'>) => {
-    try {
-      const docRef = await addDoc(collection(db, 'receipts'), receiptData);
-      setReceipts((prev) => [...prev, { ...receiptData, id: docRef.id }]);
-    } catch (error) {
-      console.error("Error adding receipt to Firestore:", error);
-    }
+  const addReceipt = (receiptData: Omit<Receipt, 'id'>) => {
+    const newReceipt = { ...receiptData, id: Date.now().toString() };
+    setReceipts((prev) => [...prev, newReceipt]);
   };
-
-  const setMonthlyLimit = async (limit: number | null) => {
-    try {
-      await setDoc(doc(db, 'settings', SETTINGS_DOC_ID), { monthlyLimit: limit });
-      setMonthlyLimitState(limit);
-    } catch (error) {
-      console.error("Error setting monthly limit:", error);
-    }
-  };
-
 
   const totalExpenses = useMemo(() => {
     return receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
@@ -92,7 +48,7 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
     totalExpenses,
     dashboardAnalysis,
     setDashboardAnalysis,
-    isLoading,
+    isLoading: false, // Data is now in-memory, so not loading from a DB.
   };
 
   return (
