@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,11 +28,13 @@ export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [isListening, setIsListening] = useState(false);
   const { receipts } = useReceipts();
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -41,54 +43,65 @@ export function Chatbot() {
   }, [messages]);
 
   const handleVoiceInput = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+    
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         toast({ variant: 'destructive', title: 'Voice recognition not supported in your browser.'});
         return;
     }
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.lang = 'en-US';
+    recognitionRef.current.interimResults = false;
+    recognitionRef.current.maxAlternatives = 1;
 
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = (event: any) => {
-        toast({ variant: 'destructive', title: 'Voice recognition error', description: event.error });
+    recognitionRef.current.onstart = () => setIsListening(true);
+    recognitionRef.current.onend = () => setIsListening(false);
+    recognitionRef.current.onerror = (event: any) => {
+        let errorMessage = event.error;
+        if (event.error === 'not-allowed') {
+            errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
+        } else if (event.error === 'no-speech') {
+            errorMessage = "No speech detected. Please try again.";
+        }
+        toast({ variant: 'destructive', title: 'Voice recognition error', description: errorMessage });
         setIsListening(false);
     };
-    recognition.onresult = (event: any) => {
+    recognitionRef.current.onresult = (event: any) => {
         const speechResult = event.results[0][0].transcript;
+        setInput(speechResult);
         handleSubmit(speechResult);
     };
 
-    recognition.start();
+    recognitionRef.current.start();
   };
 
   const handleSubmit = async (query: string) => {
-    if (!query.trim() || isLoading) return;
+    if (!query.trim() || isPending) return;
 
     const userMessage: Message = { role: 'user', content: query };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
-    setIsLoading(true);
-
-    try {
-      const receiptData = receipts.map(r => r.text).join('\n\n---\n\n');
-      if (!receiptData) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: "I don't have any receipt information yet. Please upload a receipt first." }]);
-        setIsLoading(false);
-        return;
+    
+    startTransition(async () => {
+      try {
+        const receiptData = receipts.map(r => `Receipt from ${new Date(r.id).toLocaleString()}:\n${r.text}`).join('\n\n---\n\n');
+        if (!receiptData) {
+          setMessages((prev) => [...prev, { role: 'assistant', content: "I don't have any receipt information yet. Please upload a receipt first." }]);
+          return;
+        }
+        
+        const result = await receiptChatbot({ receiptData, query });
+        setMessages((prev) => [...prev, { role: 'assistant', content: result.response }]);
+      } catch (error) {
+        console.error('Chatbot error:', error);
+        setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting. Please try again later." }]);
       }
-      
-      const result = await receiptChatbot({ receiptData, query });
-      setMessages((prev) => [...prev, { role: 'assistant', content: result.response }]);
-    } catch (error) {
-      console.error('Chatbot error:', error);
-      setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting. Please try again later." }]);
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   return (
@@ -117,7 +130,7 @@ export function Chatbot() {
                   {message.role === 'user' && (<Avatar><AvatarFallback><User /></AvatarFallback></Avatar>)}
                 </div>
               ))}
-              {isLoading && (
+              {isPending && (
                  <div className="flex items-start gap-3 justify-start">
                     <Avatar><AvatarFallback><Sparkles className="text-accent" /></AvatarFallback></Avatar>
                     <div className="p-3 rounded-lg bg-secondary"><Loader2 className="h-5 w-5 animate-spin"/></div>
@@ -127,11 +140,11 @@ export function Chatbot() {
           </ScrollArea>
           <SheetFooter>
             <form onSubmit={(e) => { e.preventDefault(); handleSubmit(input); }} className="flex w-full items-center space-x-2">
-              <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your message..." disabled={isLoading} />
-              <Button type="button" variant="outline" size="icon" onClick={handleVoiceInput} disabled={isLoading}>
+              <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your message..." disabled={isPending} />
+              <Button type="button" variant="outline" size="icon" onClick={handleVoiceInput} disabled={isPending}>
                 <Mic className={cn("h-4 w-4", isListening && "text-destructive animate-pulse")} />
               </Button>
-              <Button type="submit" disabled={isLoading || !input.trim()} size="icon">
+              <Button type="submit" disabled={isPending || !input.trim()} size="icon">
                 <Send className="h-4 w-4" />
               </Button>
             </form>
