@@ -14,7 +14,7 @@ import {z} from 'genkit';
 const webSearch = ai.defineTool(
   {
     name: 'webSearch',
-    description: 'Searches the web for information.',
+    description: 'Performs a Google web search to answer user questions.',
     inputSchema: z.object({
       query: z.string().describe('The search query.'),
     }),
@@ -56,7 +56,7 @@ const receiptChatbotPrompt = ai.definePrompt({
 
   You are able to understand multiple languages and respond accordingly, and are able to take voice input.
 
-  Use the following receipt data to answer the user's question. If the information is not available in the receipt data, use the webSearch tool with the user's query to find the answer.
+  Use the following receipt data to answer the user's question. If the information is not available in the receipt data, use the Google web search tool with the user's query to find the answer.
 
   If the language is provided, respond in that language.
 
