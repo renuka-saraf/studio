@@ -69,51 +69,49 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
     reader.readAsDataURL(file);
   };
   
-  const processImage = (dataUri: string) => {
+  const processImage = async (dataUri: string) => {
     setIsProcessing(true);
     setShowScanner(true);
     setPreview(dataUri);
 
-    setTimeout(async () => {
-      try {
-        const extractedTextResponse = await extractText({
-          photoDataUri: dataUri,
-        });
+    try {
+      const extractedTextResponse = await extractText({
+        photoDataUri: dataUri,
+      });
 
-        const receiptText = extractedTextResponse.extractedText;
-        
-        const result = await categorizeExpense({
-          receiptDataUri: dataUri,
-          receiptText: receiptText,
-        });
-        
-        const newReceipt: Omit<Receipt, 'id'> = {
-          imageDataUri: dataUri,
-          text: receiptText,
-          category: result.category,
-          amount: result.amount,
-          currency: result.currency,
-        };
-        
-        addReceipt(newReceipt);
-        toast({
-          title: "Receipt Categorized!",
-          description: `Expense added to '${result.category}' with ${Math.round(result.confidence * 100)}% confidence.`,
-        });
-        
-      } catch (error) {
-        console.error("Categorization failed:", error);
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "Failed to categorize the receipt. Please try again.",
-        });
-      } finally {
-        setIsProcessing(false);
-        setShowScanner(false);
-        setPreview(null);
-      }
-    }, 2500); // Simulating analysis time
+      const receiptText = extractedTextResponse.extractedText;
+      
+      const result = await categorizeExpense({
+        receiptDataUri: dataUri,
+        receiptText: receiptText,
+      });
+      
+      const newReceipt: Omit<Receipt, 'id'> = {
+        imageDataUri: dataUri,
+        text: receiptText,
+        category: result.category,
+        amount: result.amount,
+        currency: result.currency,
+      };
+      
+      addReceipt(newReceipt);
+      toast({
+        title: "Receipt Categorized!",
+        description: `Expense added to '${result.category}' with ${Math.round(result.confidence * 100)}% confidence.`,
+      });
+      
+    } catch (error) {
+      console.error("Categorization failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Failed to categorize the receipt. Please try again.",
+      });
+    } finally {
+      setIsProcessing(false);
+      setShowScanner(false);
+      setPreview(null);
+    }
   };
 
   const onDrop = (acceptedFiles: File[]) => {
