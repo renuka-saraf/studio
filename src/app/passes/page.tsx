@@ -63,11 +63,12 @@ export default function PassesPage() {
 
   const categorizedData = useMemo(() => {
     const data = receipts.reduce((acc, receipt) => {
-      if (!acc[receipt.category]) {
-        acc[receipt.category] = { receipts: [], total: 0, currency: receipt.currency };
+      const category = receipt.category || 'other';
+      if (!acc[category]) {
+        acc[category] = { receipts: [], total: 0, currency: receipt.currency };
       }
-      acc[receipt.category].receipts.push(receipt);
-      acc[receipt.category].total += receipt.amount;
+      acc[category].receipts.push(receipt);
+      acc[category].total += receipt.amount;
       return acc;
     }, {} as { [key: string]: { receipts: Receipt[], total: number, currency: string } });
 
@@ -86,7 +87,7 @@ export default function PassesPage() {
     try {
       return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(total);
     } catch {
-      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", currencyDisplay: 'code' }).format(total).replace("USD", currency);
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", currencyDisplay: 'code' }).format(total).replace("USD", currency || "USD");
     }
   };
   
@@ -135,8 +136,8 @@ export default function PassesPage() {
               <AccordionTrigger className="p-6">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-full ${categoryConfig[category].color}`}>
-                      {categoryConfig[category].icon}
+                    <div className={`p-3 rounded-full ${categoryConfig[category]?.color || categoryConfig['other'].color}`}>
+                      {categoryConfig[category]?.icon || categoryConfig['other'].icon}
                     </div>
                     <div>
                       <CardTitle className="capitalize text-left">{category}</CardTitle>
