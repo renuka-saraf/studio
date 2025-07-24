@@ -4,8 +4,7 @@ import { useMemo } from 'react';
 import { useReceipts, Receipt } from '@/context/receipt-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { FileQuestion, Utensils, Shirt, Plane, MoreHorizontal, Ticket } from 'lucide-react';
-import Image from 'next/image';
+import { FileText, Utensils, Shirt, Plane, MoreHorizontal, Ticket } from 'lucide-react';
 import { Chatbot } from '@/components/scanalyze/chatbot';
 
 const categoryConfig: { [key: string]: { icon: JSX.Element; color: string; } } = {
@@ -34,17 +33,22 @@ function PassCard({ receipt }: { receipt: Receipt }) {
     const formattedAmount = getFormattedAmount();
     const config = categoryConfig[receipt.category];
 
+    const summary = receipt.text.split('\n').slice(0, 2).join(' / ');
+
     return (
         <div className={`flex items-center space-x-4 rounded-lg border p-4 transition-transform hover:shadow-lg ${config.color}`}>
-            <div className="flex-shrink-0">
-              <Image src={receipt.imageDataUri} alt="Receipt thumbnail" width={80} height={80} className="object-cover rounded-md aspect-square" data-ai-hint="receipt abstract" />
+            <div className={`flex-shrink-0 h-20 w-20 rounded-md flex items-center justify-center ${config.color}`}>
+              <FileText className="h-8 w-8" />
             </div>
             <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium capitalize truncate">{receipt.category} Pass</p>
-                    <p className="text-lg font-bold">{formattedAmount}</p>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <p className="text-sm font-medium capitalize truncate">{receipt.category} Pass</p>
+                        <p className="text-sm text-muted-foreground mt-1 truncate" title={summary}>{summary}</p>
+                    </div>
+                    <p className="text-lg font-bold flex-shrink-0 ml-4">{formattedAmount}</p>
                 </div>
-                <p className="text-sm truncate">
+                <p className="text-sm text-right mt-2">
                     {new Date(receipt.id).toLocaleString()}
                 </p>
             </div>
