@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { ReceiptUploader } from '@/components/scanalyze/receipt-uploader';
 import { ReceiptList } from '@/components/scanalyze/receipt-list';
-import { Chatbot } from '@/components/scanalyze/chatbot';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function HomePage() {
@@ -36,7 +35,6 @@ export default function HomePage() {
       </div>
       
       <ReceiptList isProcessing={isProcessing} />
-      <Chatbot />
     </div>
   );
 }

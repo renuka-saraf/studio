@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FileQuestion, Utensils, Shirt, Plane, MoreHorizontal, Ticket } from 'lucide-react';
 import Image from 'next/image';
+import { Chatbot } from '@/components/scanalyze/chatbot';
 
 const categoryConfig: { [key: string]: { icon: JSX.Element; color: string; } } = {
   food: { icon: <Utensils className="h-6 w-6" />, color: "bg-red-500/10 text-red-700 dark:text-red-400" },
@@ -65,11 +66,14 @@ export default function PassesPage() {
 
   if (receipts.length === 0) {
     return (
-      <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-        <Ticket className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-semibold">No Passes Available</h3>
-        <p className="mt-1 text-sm text-gray-500">Scan a receipt to generate a pass.</p>
-      </div>
+      <>
+        <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
+          <Ticket className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-semibold">No Passes Available</h3>
+          <p className="mt-1 text-sm text-gray-500">Scan a receipt to generate a pass.</p>
+        </div>
+        <Chatbot />
+      </>
     );
   }
 
@@ -110,6 +114,7 @@ export default function PassesPage() {
           </Card>
         ))}
       </Accordion>
+      <Chatbot />
     </div>
   );
 }
