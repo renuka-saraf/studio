@@ -32,7 +32,7 @@ const webSearch = ai.defineTool(
 const ReceiptChatbotInputSchema = z.object({
   receiptData: z
     .string()
-    .describe('The receipt data, containing details such as items, prices, and date.'),
+    .describe('A JSON string of receipt data, containing details such as items, prices, category, amount, and date.'),
   query: z.string().describe('The user query related to the receipt data.'),
   language: z.string().optional().describe('The language in which the query should be answered.'),
 });
@@ -52,11 +52,13 @@ const receiptChatbotPrompt = ai.definePrompt({
   input: {schema: ReceiptChatbotInputSchema},
   output: {schema: ReceiptChatbotOutputSchema},
   tools: [webSearch],
-  prompt: `You are a chatbot assistant specialized in answering questions about uploaded receipts.
+  prompt: `You are a chatbot assistant specialized in answering questions about uploaded receipts. You can also analyze spending patterns.
 
   You are able to understand multiple languages and respond accordingly, and are able to take voice input.
 
-  Use the following receipt data to answer the user's question. If the information is not available in the receipt data, use the Google web search tool with the user's query to find the answer.
+  Use the following JSON receipt data to answer the user's question. If the information is not available in the receipt data, use the Google web search tool with the user's query to find the answer.
+
+  When asked about spending, analyze the provided receipt data to answer questions like "Which category did I spend the most in?".
 
   If the language is provided, respond in that language.
 

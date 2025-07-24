@@ -89,8 +89,16 @@ export function Chatbot() {
     
     startTransition(async () => {
       try {
-        const receiptData = receipts.map(r => `Receipt from ${new Date(r.id).toLocaleString()}:\n${r.text}`).join('\n\n---\n\n');
-        if (!receiptData) {
+        const receiptData = JSON.stringify(receipts.map(r => ({
+          id: r.id,
+          date: new Date(r.id).toLocaleString(),
+          category: r.category,
+          amount: r.amount,
+          currency: r.currency,
+          items: r.text.split('\n').slice(0, 10).join(', ') // A summary of items
+        })));
+        
+        if (!receipts || receipts.length === 0) {
           setMessages((prev) => [...prev, { role: 'assistant', content: "I don't have any receipt information yet. Please upload a receipt first." }]);
           return;
         }

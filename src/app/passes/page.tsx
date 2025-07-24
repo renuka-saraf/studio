@@ -59,14 +59,34 @@ function PassCard({ receipt }: { receipt: Receipt }) {
 export default function PassesPage() {
   const { receipts } = useReceipts();
 
-  const categorizedReceipts = useMemo(() => {
-    return receipts.reduce((acc, receipt) => {
-      (acc[receipt.category] = acc[receipt.category] || []).push(receipt);
+  const categorizedData = useMemo(() => {
+    const data = receipts.reduce((acc, receipt) => {
+      if (!acc[receipt.category]) {
+        acc[receipt.category] = { receipts: [], total: 0, currency: receipt.currency };
+      }
+      acc[receipt.category].receipts.push(receipt);
+      acc[receipt.category].total += receipt.amount;
       return acc;
-    }, {} as { [key: string]: Receipt[] });
+    }, {} as { [key: string]: { receipts: Receipt[], total: number, currency: string } });
+
+    // Sort categories by total amount descending
+    return Object.entries(data)
+      .sort(([, a], [, b]) => b.total - a.total)
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {} as typeof data);
   }, [receipts]);
 
-  const categories = Object.keys(categorizedReceipts);
+  const categories = Object.keys(categorizedData);
+  
+  const getFormattedTotal = (total: number, currency: string) => {
+    try {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(total);
+    } catch {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", currencyDisplay: 'code' }).format(total).replace("USD", currency);
+    }
+  };
 
   if (receipts.length === 0) {
     return (
@@ -95,21 +115,27 @@ export default function PassesPage() {
           <Card key={category}>
             <AccordionItem value={category} className="border-b-0">
               <AccordionTrigger className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-full ${categoryConfig[category].color}`}>
-                    {categoryConfig[category].icon}
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-full ${categoryConfig[category].color}`}>
+                      {categoryConfig[category].icon}
+                    </div>
+                    <div>
+                      <CardTitle className="capitalize text-left">{category}</CardTitle>
+                      <CardDescription className="text-left">
+                          {categorizedData[category].receipts.length} {categorizedData[category].receipts.length === 1 ? 'pass' : 'passes'}
+                      </CardDescription>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="capitalize text-left">{category}</CardTitle>
-                    <CardDescription className="text-left">
-                        {categorizedReceipts[category].length} {categorizedReceipts[category].length === 1 ? 'pass' : 'passes'}
-                    </CardDescription>
-                  </div>
+                   <div className="text-right">
+                      <p className="text-xl font-bold">{getFormattedTotal(categorizedData[category].total, categorizedData[category].currency)}</p>
+                      <p className="text-sm text-muted-foreground">Total Spent</p>
+                    </div>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="p-6 pt-0">
                 <div className="space-y-4">
-                  {categorizedReceipts[category].slice().reverse().map((receipt) => (
+                  {categorizedData[category].receipts.slice().reverse().map((receipt) => (
                     <PassCard key={receipt.id} receipt={receipt} />
                   ))}
                 </div>
