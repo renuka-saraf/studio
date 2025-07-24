@@ -56,7 +56,7 @@ const receiptChatbotPrompt = ai.definePrompt({
 
   You are able to understand multiple languages and respond accordingly, and are able to take voice input.
 
-  Use the following receipt data to answer the user's question. If the information is not available in the receipt data, use the web search tool to find the answer.
+  Use the following receipt data to answer the user's question. If the information is not available in the receipt data, use the webSearch tool with the user's query to find the answer.
 
   If the language is provided, respond in that language.
 
