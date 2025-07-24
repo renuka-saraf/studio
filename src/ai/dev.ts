@@ -1,3 +1,4 @@
+
 import { config } from 'dotenv';
 config();
 
@@ -8,3 +9,6 @@ import '@/ai/flows/monthly-expense-tracking.ts';
 import '@/ai/flows/receipt-chatbot-assistance.ts';
 import '@/ai/flows/meal-plan-maximizer.ts';
 import '@/ai/flows/categorize-expense.ts';
+import '@/ai/flows/extract-text.ts';
+
+    

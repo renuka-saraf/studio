@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, type Dispatch, type SetStateAction, useEffect } from 'react';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useReceipts, type Receipt } from '@/context/receipt-context';
 import { categorizeExpense } from '@/ai/flows/categorize-expense';
+import {extractText} from '@/ai/flows/extract-text';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -74,19 +76,21 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
 
     setTimeout(async () => {
       try {
-        // In a real app, you would use an OCR service to extract text.
-        // For this demo, we'll use mock data.
-        const mockReceiptText = "Receipt for groceries: milk, bread, eggs.";
+        const extractedTextResponse = await extractText({
+          photoDataUri: dataUri,
+        });
+
+        const receiptText = extractedTextResponse.extractedText;
         
         const result = await categorizeExpense({
           receiptDataUri: dataUri,
-          receiptText: mockReceiptText,
+          receiptText: receiptText,
         });
         
         const newReceipt: Receipt = {
           id: new Date().toISOString(),
           imageDataUri: dataUri,
-          text: mockReceiptText,
+          text: receiptText,
           category: result.category,
           // In a real app, you'd extract this from the receipt text.
           amount: parseFloat((Math.random() * (200 - 10) + 10).toFixed(2)),
@@ -224,3 +228,5 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
     </>
   );
 }
+
+    
