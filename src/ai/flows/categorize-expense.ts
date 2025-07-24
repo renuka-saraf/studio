@@ -48,7 +48,7 @@ You will be provided with the text extracted from a receipt and an image of the 
 1.  Categorize the expense into one of the following categories: food, fashion, travel, or other.
 2.  Provide a confidence level for your categorization, from 0 to 1.
 3.  Extract the total amount from the receipt. This is usually the largest number at the end of the receipt.
-4.  Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP, INR).
+4.  Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP, INR). If the currency is not mentioned, default to INR.
 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}
