@@ -22,6 +22,10 @@ interface ReceiptContextType {
   dashboardAnalysis: AnalyzeExpensesOutput | null;
   setDashboardAnalysis: Dispatch<SetStateAction<AnalyzeExpensesOutput | null>>;
   isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, pin: string) => boolean;
+  logout: () => void;
+  sendPin: (email: string) => Promise<boolean>;
 }
 
 const ReceiptContext = createContext<ReceiptContextType | undefined>(undefined);
@@ -30,11 +34,36 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [monthlyLimit, setMonthlyLimit] = useState<number | null>(1000);
   const [dashboardAnalysis, setDashboardAnalysis] = useState<AnalyzeExpensesOutput | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const addReceipt = (receiptData: Omit<Receipt, 'id'>) => {
     const newReceipt = { ...receiptData, id: Date.now().toString() };
     setReceipts((prev) => [...prev, newReceipt]);
   };
+  
+  const sendPin = async (email: string) => {
+    // In a real app, you'd call an AI flow or backend service to send a PIN.
+    // For this prototype, we'll just log it and move to the PIN entry step.
+    console.log(`Simulating sending PIN to ${email}. In a real app, an email would be sent.`);
+    setUserEmail(email);
+    return true;
+  };
+
+  const login = (email: string, pin: string) => {
+    // In a real app, you would verify the PIN against a backend service.
+    // For this prototype, we'll accept any PIN for the given email.
+    if (userEmail === email && pin.length > 0) {
+      setIsAuthenticated(true);
+      return true;
+    }
+    return false;
+  };
+  
+  const logout = () => {
+      setIsAuthenticated(false);
+      setUserEmail(null);
+  }
 
   const totalExpenses = useMemo(() => {
     return receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
@@ -48,7 +77,11 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
     totalExpenses,
     dashboardAnalysis,
     setDashboardAnalysis,
-    isLoading: false, // Data is now in-memory, so not loading from a DB.
+    isLoading: false,
+    isAuthenticated,
+    login,
+    logout,
+    sendPin,
   };
 
   return (

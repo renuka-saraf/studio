@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -9,12 +10,14 @@ import {
   ScanLine,
   Factory,
   Ticket,
+  LogOut,
 } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
   SidebarHeader,
   SidebarContent,
+  SidebarFooter,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -23,9 +26,12 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useReceipts } from '@/context/receipt-context';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { isAuthenticated, logout } = useReceipts();
 
   const menuItems = [
     { href: '/', label: 'Scan Receipt', icon: Home },
@@ -49,23 +55,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === item.href}
-                  tooltip={{ children: item.label, className: "font-body" }}
-                >
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span className="font-body">{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          {isAuthenticated && (
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={{ children: item.label, className: "font-body" }}
+                  >
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span className="font-body">{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          )}
         </SidebarContent>
+        {isAuthenticated && (
+            <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton onClick={logout} tooltip={{children: "Logout", className: "font-body"}}>
+                            <LogOut />
+                            <span className="font-body">Logout</span>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarFooter>
+        )}
       </Sidebar>
       <SidebarInset>
         <div className={cn("p-4 sm:p-6 lg:p-8")}>

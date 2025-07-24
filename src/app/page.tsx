@@ -1,12 +1,19 @@
+
 "use client";
 
 import { useState } from 'react';
+import { useReceipts } from '@/context/receipt-context';
+import { EmailAuth } from '@/components/scanalyze/email-auth';
 import { ReceiptUploader } from '@/components/scanalyze/receipt-uploader';
 import { ReceiptList } from '@/components/scanalyze/receipt-list';
-import { Card, CardContent } from '@/components/ui/card';
 
 export default function HomePage() {
+  const { isAuthenticated } = useReceipts();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  if (!isAuthenticated) {
+    return <EmailAuth />;
+  }
 
   return (
     <div className="container mx-auto p-0">
