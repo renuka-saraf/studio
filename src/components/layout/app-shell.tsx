@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   ScanLine,
   Factory,
+  Ticket,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/', label: 'Scan Receipt', icon: Home },
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/inventory', label: 'Inventory', icon: Factory },
+    { href: '/passes', label: 'Passes', icon: Ticket },
   ];
 
   return (
@@ -66,11 +68,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <div className={cn("p-4 sm:p-6 lg:p-8", pathname === '/' && 'p-0 sm:p-0 lg:p-0')}>
+        <div className={cn("p-4 sm:p-6 lg:p-8")}>
             <header className="flex h-14 items-center justify-end border-b bg-background px-4 md:hidden">
               <SidebarTrigger />
             </header>
-            <main className={cn(pathname !== '/' && 'p-4 sm:p-6')}>
+            <main>
               {children}
             </main>
         </div>

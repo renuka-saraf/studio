@@ -148,7 +148,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
 
   return (
     <>
-      <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-none sm:rounded-lg">
+      <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardContent className="p-0">
           <div
             {...getRootProps()}

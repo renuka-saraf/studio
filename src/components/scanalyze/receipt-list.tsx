@@ -14,7 +14,7 @@ export function ReceiptList({ isProcessing }: ReceiptListProps) {
 
   if (receipts.length === 0 && !isProcessing) {
     return (
-      <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg mt-8 mx-4 sm:mx-0">
+      <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg mt-8">
         <FileQuestion className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No receipts yet</h3>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Upload a receipt to get started.</p>
@@ -23,7 +23,7 @@ export function ReceiptList({ isProcessing }: ReceiptListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-0">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {receipts.slice().reverse().map((receipt) => (
         <ReceiptCard key={receipt.id} receipt={receipt} />
       ))}

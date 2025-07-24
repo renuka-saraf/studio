@@ -10,7 +10,7 @@ export default function HomePage() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   return (
-    <div className="container mx-auto p-0 sm:p-4">
+    <div className="container mx-auto p-0">
       <header className="mb-8 text-center sm:text-left">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 font-headline">
           Scan & Analyze
