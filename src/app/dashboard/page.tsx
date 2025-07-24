@@ -1,0 +1,32 @@
+"use client";
+
+import { ExpenseDashboard } from '@/components/scanalyze/expense-dashboard';
+import { ExpenseTracker } from '@/components/scanalyze/expense-tracker';
+
+export default function DashboardPage() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight font-headline">Expense Dashboard</h1>
+        <p className="mt-2 text-lg text-muted-foreground">
+          AI-powered insights into your spending habits.
+        </p>
+      </div>
+
+      <ExpenseTracker />
+      
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-background px-3 text-lg font-medium font-headline">
+            Spending Analysis
+          </span>
+        </div>
+      </div>
+      
+      <ExpenseDashboard />
+    </div>
+  );
+}
