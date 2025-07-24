@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from 'react';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { FileText, Utensils, Shirt, Plane, MoreHorizontal, Ticket } from 'lucide-react';
 import { Chatbot } from '@/components/scanalyze/chatbot';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const categoryConfig: { [key: string]: { icon: JSX.Element; color: string; } } = {
   food: { icon: <Utensils className="h-6 w-6" />, color: "bg-red-500/10 text-red-700 dark:text-red-400" },
@@ -57,7 +59,7 @@ function PassCard({ receipt }: { receipt: Receipt }) {
 }
 
 export default function PassesPage() {
-  const { receipts } = useReceipts();
+  const { receipts, isLoading } = useReceipts();
 
   const categorizedData = useMemo(() => {
     const data = receipts.reduce((acc, receipt) => {
@@ -87,6 +89,22 @@ export default function PassesPage() {
       return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", currencyDisplay: 'code' }).format(total).replace("USD", currency);
     }
   };
+  
+  if (isLoading) {
+    return (
+        <div className="space-y-8">
+            <div>
+                <Skeleton className="h-10 w-1/2" />
+                <Skeleton className="mt-2 h-6 w-3/4" />
+            </div>
+            <div className="space-y-4">
+                <Card><CardHeader><Skeleton className="h-12 w-full" /></CardHeader></Card>
+                <Card><CardHeader><Skeleton className="h-12 w-full" /></CardHeader></Card>
+                <Card><CardHeader><Skeleton className="h-12 w-full" /></CardHeader></Card>
+            </div>
+        </div>
+    )
+  }
 
   if (receipts.length === 0) {
     return (

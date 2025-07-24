@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useReceipts } from '@/context/receipt-context';
@@ -10,7 +11,23 @@ interface ReceiptListProps {
 }
 
 export function ReceiptList({ isProcessing }: ReceiptListProps) {
-  const { receipts } = useReceipts();
+  const { receipts, isLoading } = useReceipts();
+
+  if (isLoading) {
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, i) => (
+                <div className="flex flex-col space-y-3" key={i}>
+                    <Skeleton className="h-[250px] w-full rounded-xl" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
+  }
 
   if (receipts.length === 0 && !isProcessing) {
     return (

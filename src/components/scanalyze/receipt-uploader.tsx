@@ -87,8 +87,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
           receiptText: receiptText,
         });
         
-        const newReceipt: Receipt = {
-          id: new Date().toISOString(),
+        const newReceipt: Omit<Receipt, 'id'> = {
           imageDataUri: dataUri,
           text: receiptText,
           category: result.category,
