@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Utensils, ShoppingCart, Loader2, Sparkles, Plane, Shirt, MoreHorizontal, ShoppingBasket } from "lucide-react";
+import { Utensils, ShoppingCart, Loader2, Sparkles, Plane, Shirt, MoreHorizontal } from "lucide-react";
 import type { Receipt } from "@/context/receipt-context";
 import { mealPlanMaximizer } from "@/ai/flows/meal-plan-maximizer";
 import { quickCommerceReorder } from "@/ai/flows/quick-commerce-reorder";
@@ -18,8 +18,7 @@ interface ReceiptCardProps {
 }
 
 const categoryIcons: { [key: string]: JSX.Element } = {
-  grocery: <ShoppingBasket className="h-4 w-4" />,
-  dining: <Utensils className="h-4 w-4" />,
+  food: <Utensils className="h-4 w-4" />,
   fashion: <Shirt className="h-4 w-4" />,
   travel: <Plane className="h-4 w-4" />,
   other: <MoreHorizontal className="h-4 w-4" />,
@@ -111,7 +110,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
             {new Date(parseInt(receipt.id)).toLocaleString()}
           </p>
         </CardContent>
-        {receipt.category === "grocery" && (
+        {receipt.category === "food" && (
           <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row gap-2">
             <Button className="w-full" variant="outline" onClick={() => setIsMaximizerOpen(true)}>
               <Sparkles className="mr-2 h-4 w-4 text-accent" />
