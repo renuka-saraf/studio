@@ -50,31 +50,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <Sidebar>
-        <SidebarHeader>
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href="/">
-                            <ScanLine className="h-6 w-6 text-primary" />
-                            <span className="sr-only">Scanalyze</span>
-                        </Link>
-                    </Button>
-                    <h1 className="text-lg font-semibold tracking-tight font-headline">Scanalyze</h1>
-                </div>
-            </div>
-        </SidebarHeader>
         <SidebarContent>
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-               <div className="flex items-center justify-between px-2">
-                 <div className='flex-1'></div>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Menu className="h-6 w-6" />
-                      <span className="sr-only">Toggle menu</span>
-                    </Button>
-                  </CollapsibleTrigger>
-               </div>
+              <SidebarHeader>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 flex-1">
+                        <Button variant="ghost" size="icon" asChild>
+                            <Link href="/">
+                                <ScanLine className="h-6 w-6 text-primary" />
+                                <span className="sr-only">Scanalyze</span>
+                            </Link>
+                        </Button>
+                        <h1 className="text-lg font-semibold tracking-tight font-headline">Scanalyze</h1>
+                    </div>
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Menu className="h-6 w-6" />
+                        <span className="sr-only">Toggle menu</span>
+                      </Button>
+                    </CollapsibleTrigger>
+                </div>
+              </SidebarHeader>
               <CollapsibleContent>
                 <SidebarMenu className="mt-2">
                   {menuItems.map((item) => (
@@ -94,6 +91,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </SidebarMenu>
               </CollapsibleContent>
             </Collapsible>
+          ) : (
+            <SidebarHeader>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/">
+                            <ScanLine className="h-6 w-6 text-primary" />
+                            <span className="sr-only">Scanalyze</span>
+                        </Link>
+                    </Button>
+                    <h1 className="text-lg font-semibold tracking-tight font-headline">Scanalyze</h1>
+                </div>
+            </SidebarHeader>
           )}
         </SidebarContent>
         {isAuthenticated && (
