@@ -11,7 +11,13 @@ import {
   Factory,
   Ticket,
   LogOut,
+  Menu,
 } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
   SidebarProvider,
   Sidebar,
@@ -32,6 +38,7 @@ import { Avatar, AvatarFallback } from '../ui/avatar';
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { isAuthenticated, logout } = useReceipts();
+  const [isOpen, setIsOpen] = React.useState(true);
 
   const menuItems = [
     { href: '/', label: 'Scan Receipt', icon: Home },
@@ -44,34 +51,49 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-            <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/">
-                        <ScanLine className="h-6 w-6 text-primary" />
-                        <span className="sr-only">Scanalyze</span>
-                    </Link>
-                </Button>
-                <h1 className="text-lg font-semibold tracking-tight font-headline">Scanalyze</h1>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/">
+                            <ScanLine className="h-6 w-6 text-primary" />
+                            <span className="sr-only">Scanalyze</span>
+                        </Link>
+                    </Button>
+                    <h1 className="text-lg font-semibold tracking-tight font-headline">Scanalyze</h1>
+                </div>
             </div>
         </SidebarHeader>
         <SidebarContent>
           {isAuthenticated && (
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={{ children: item.label, className: "font-body" }}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span className="font-body">{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+               <div className="flex items-center justify-between px-2">
+                 <div className='flex-1'></div>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-6 w-6" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </CollapsibleTrigger>
+               </div>
+              <CollapsibleContent>
+                <SidebarMenu className="mt-2">
+                  {menuItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        tooltip={{ children: item.label, className: "font-body" }}
+                      >
+                        <Link href={item.href}>
+                          <item.icon />
+                          <span className="font-body">{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </SidebarContent>
         {isAuthenticated && (
