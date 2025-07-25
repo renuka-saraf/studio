@@ -24,7 +24,7 @@ export type CategorizeExpenseInput = z.infer<typeof CategorizeExpenseInputSchema
 
 const CategorizeExpenseOutputSchema = z.object({
   category: z
-    .enum(['food', 'fashion', 'travel', 'other'])
+    .enum(['grocery', 'dining', 'fashion', 'travel', 'other'])
     .describe('The category of the expense.'),
   confidence: z
     .number()
@@ -45,10 +45,13 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert expense categorizer and data extractor.
 
 You will be provided with the text extracted from a receipt and an image of the receipt. You must perform the following tasks:
-1.  Categorize the expense into one of the following categories: food, fashion, travel, or other.
-2.  Provide a confidence level for your categorization, from 0 to 1.
-3.  Extract the total amount from the receipt. This is usually the largest number at the end of the receipt.
-4.  Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP).
+1.  Categorize the expense into one of the following categories: 'grocery', 'dining', 'fashion', 'travel', or 'other'.
+2.  If the receipt contains items like 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato', 'potato', 'sugar', or other raw food ingredients, it should be categorized as 'grocery'.
+3.  If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
+4.  If the receipt is from a hotel or for an airline ticket, it must be categorized as 'travel'.
+5.  Provide a confidence level for your categorization, from 0 to 1.
+6.  Extract the total amount from the receipt. This is usually the largest number at the end of the receipt.
+7.  Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP).
 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}

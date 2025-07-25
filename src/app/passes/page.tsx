@@ -5,12 +5,13 @@ import { useMemo } from 'react';
 import { useReceipts, Receipt } from '@/context/receipt-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { FileText, Utensils, Shirt, Plane, MoreHorizontal, Ticket } from 'lucide-react';
+import { FileText, Utensils, Shirt, Plane, MoreHorizontal, Ticket, Wheat } from 'lucide-react';
 import { Chatbot } from '@/components/scanalyze/chatbot';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const categoryConfig: { [key: string]: { icon: JSX.Element; color: string; } } = {
-  food: { icon: <Utensils className="h-6 w-6" />, color: "bg-green-500/10 text-green-700 dark:text-green-400" },
+  grocery: { icon: <Wheat className="h-6 w-6" />, color: "bg-green-500/10 text-green-700 dark:text-green-400" },
+  dining: { icon: <Utensils className="h-6 w-6" />, color: "bg-orange-500/10 text-orange-700 dark:text-orange-400" },
   fashion: { icon: <Shirt className="h-6 w-6" />, color: "bg-blue-500/10 text-blue-700 dark:text-blue-400" },
   travel: { icon: <Plane className="h-6 w-6" />, color: "bg-purple-500/10 text-purple-700 dark:text-purple-400" },
   other: { icon: <MoreHorizontal className="h-6 w-6" />, color: "bg-gray-500/10 text-gray-700 dark:text-gray-400" },
