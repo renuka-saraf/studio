@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Utensils, ShoppingCart, Loader2, Sparkles, Plane, Shirt, MoreHorizontal } from "lucide-react";
+import { Utensils, ShoppingCart, Loader2, Sparkles, Plane, Shirt, MoreHorizontal, ShoppingBasket } from "lucide-react";
 import type { Receipt } from "@/context/receipt-context";
 import { mealPlanMaximizer } from "@/ai/flows/meal-plan-maximizer";
 import { quickCommerceReorder } from "@/ai/flows/quick-commerce-reorder";
@@ -18,7 +18,8 @@ interface ReceiptCardProps {
 }
 
 const categoryIcons: { [key: string]: JSX.Element } = {
-  food: <Utensils className="h-4 w-4" />,
+  grocery: <ShoppingBasket className="h-4 w-4" />,
+  dining: <Utensils className="h-4 w-4" />,
   fashion: <Shirt className="h-4 w-4" />,
   travel: <Plane className="h-4 w-4" />,
   other: <MoreHorizontal className="h-4 w-4" />,
@@ -101,7 +102,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
         <CardContent className="flex-grow p-4">
           <div className="flex justify-between items-start">
             <Badge variant="secondary" className="capitalize flex items-center gap-2">
-              {categoryIcons[receipt.category]}
+              {categoryIcons[receipt.category] || <MoreHorizontal className="h-4 w-4" />}
               {receipt.category}
             </Badge>
             <p className="text-xl font-bold text-primary">{formattedAmount}</p>
@@ -110,7 +111,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
             {new Date(parseInt(receipt.id)).toLocaleString()}
           </p>
         </CardContent>
-        {receipt.category === "food" && (
+        {receipt.category === "grocery" && (
           <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row gap-2">
             <Button className="w-full" variant="outline" onClick={() => setIsMaximizerOpen(true)}>
               <Sparkles className="mr-2 h-4 w-4 text-accent" />

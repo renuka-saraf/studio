@@ -9,7 +9,7 @@ export interface Receipt {
   id: string;
   imageDataUri: string;
   text: string;
-  category: 'food' | 'fashion' | 'travel' | 'other';
+  category: 'grocery' | 'dining' | 'fashion' | 'travel' | 'other';
   amount: number;
   currency: string;
 }
