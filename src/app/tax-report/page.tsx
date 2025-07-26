@@ -6,8 +6,9 @@ import { useReceipts } from '@/context/receipt-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, LandPlot } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { ProtectedRoute } from '@/components/layout/protected-route';
 
-export default function TaxReportPage() {
+function TaxReportPageContent() {
   const { receipts } = useReceipts();
 
   const gstData = useMemo(() => {
@@ -97,4 +98,13 @@ export default function TaxReportPage() {
       </Card>
     </div>
   );
+}
+
+
+export default function TaxReportPage() {
+    return (
+        <ProtectedRoute>
+            <TaxReportPageContent />
+        </ProtectedRoute>
+    )
 }

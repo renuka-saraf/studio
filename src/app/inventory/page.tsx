@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Briefcase, FileQuestion, Lightbulb, Loader2, RefreshCw, ShoppingCart } from 'lucide-react';
+import { ProtectedRoute } from '@/components/layout/protected-route';
 
 interface Recommendation {
   item: string;
@@ -16,7 +17,7 @@ interface Recommendation {
   suggestion: string;
 }
 
-export default function InventoryPage() {
+function InventoryPageContent() {
   const { receipts } = useReceipts();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -43,6 +44,7 @@ export default function InventoryPage() {
 
   useEffect(() => {
     fetchRecommendations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipts]);
 
   if (inventoryReceipts.length === 0 && !isPending) {
@@ -102,4 +104,13 @@ export default function InventoryPage() {
       )}
     </div>
   );
+}
+
+
+export default function InventoryPage() {
+  return (
+    <ProtectedRoute>
+      <InventoryPageContent />
+    </ProtectedRoute>
+  )
 }

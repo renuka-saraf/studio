@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { FileText, Utensils, Shirt, Plane, MoreHorizontal, Ticket, Wheat } from 'lucide-react';
 import { Chatbot } from '@/components/scanalyze/chatbot';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ProtectedRoute } from '@/components/layout/protected-route';
 
 const categoryConfig: { [key: string]: { icon: JSX.Element; color: string; } } = {
   grocery: { icon: <Wheat className="h-6 w-6" />, color: "bg-green-500/10 text-green-700 dark:text-green-400" },
@@ -59,7 +60,7 @@ function PassCard({ receipt }: { receipt: Receipt }) {
     );
 }
 
-export default function PassesPage() {
+function PassesPageContent() {
   const { receipts, isLoading } = useReceipts();
 
   const categorizedData = useMemo(() => {
@@ -167,4 +168,12 @@ export default function PassesPage() {
       <Chatbot />
     </div>
   );
+}
+
+export default function PassesPage() {
+    return (
+        <ProtectedRoute>
+            <PassesPageContent />
+        </ProtectedRoute>
+    )
 }

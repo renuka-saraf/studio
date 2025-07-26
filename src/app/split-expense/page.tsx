@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SplitExpenseDialog } from '@/components/scanalyze/split-expense-dialog';
 import { Button } from '@/components/ui/button';
 import { FileText, Users } from 'lucide-react';
+import { ProtectedRoute } from '@/components/layout/protected-route';
 
-export default function SplitExpensePage() {
+function SplitExpensePageContent() {
   const { receipts, isLoading } = useReceipts();
   const [selectedReceiptId, setSelectedReceiptId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -91,4 +92,13 @@ export default function SplitExpensePage() {
       )}
     </div>
   );
+}
+
+
+export default function SplitExpensePage() {
+  return (
+    <ProtectedRoute>
+      <SplitExpensePageContent />
+    </ProtectedRoute>
+  )
 }
