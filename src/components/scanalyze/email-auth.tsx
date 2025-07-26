@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, KeyRound, Loader2 } from 'lucide-react';
+import { ScanalyzeLogo } from '../icons/logo';
 
 export function EmailAuth() {
   const [email, setEmail] = useState('');
@@ -51,7 +52,10 @@ export function EmailAuth() {
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome to Scanalyze</CardTitle>
+          <div className="flex justify-center items-center gap-3 mb-2">
+            <ScanalyzeLogo className="h-10 w-10" />
+            <CardTitle className="text-3xl font-bold tracking-tight font-headline">Scanalyze</CardTitle>
+          </div>
           <CardDescription>
             {pinSent ? 'Enter the PIN sent to your email' : 'Sign in with your email to continue'}
           </CardDescription>
