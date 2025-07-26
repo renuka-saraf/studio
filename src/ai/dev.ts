@@ -9,5 +9,6 @@ import '@/ai/flows/receipt-chatbot-assistance.ts';
 import '@/ai/flows/meal-plan-maximizer.ts';
 import '@/ai/flows/categorize-expense.ts';
 import '@/ai/flows/extract-text.ts';
-
-    
+import '@/ai/flows/inventory-stock-recommendations.ts';
+import '@/ai/flows/tax-calculator.ts';
+import '@/ai/flows/loyalty-offers.ts';

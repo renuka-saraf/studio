@@ -24,7 +24,7 @@ interface ReceiptUploaderProps {
 }
 
 export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUploaderProps) {
-  const { addReceipt, userEmail } = useReceipts();
+  const { addReceipt, userEmail, usageType } = useReceipts();
   const { toast } = useToast();
   const [preview, setPreview] = useState<string | null>(null);
   const [showScanner, setShowScanner] = useState(false);
@@ -34,7 +34,16 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const processImage = async (dataUri: string, userEmail: string | null) => {
+  const processImage = async (dataUri: string) => {
+    if (!usageType || !userEmail) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "User or usage type not identified. Please log in again.",
+        });
+        return;
+    }
+
     setIsProcessing(true);
     setShowScanner(true);
     setPreview(dataUri);
@@ -49,6 +58,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
       const result = await categorizeExpense({
         receiptDataUri: dataUri,
         receiptText: receiptText,
+        usageType: usageType
       });
       
       const newReceiptForState: Omit<Receipt, 'id'> = {
@@ -58,20 +68,10 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         amount: result.amount,
         currency: result.currency,
         items: result.items || [],
+        gstInfo: result.gstInfo,
       };
       
       const db = getFirestore();
-
-      if (!userEmail) {
-        console.error("User email is not available. Cannot save data to Firebase.");
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "Could not save data. Please ensure you are logged in.",
-        });
-        addReceipt(newReceiptForState); // Add to local state even if DB fails
-        return; 
-      }
 
       const receiptDataForFirestore = {
         userEmail: userEmail,
@@ -81,6 +81,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         confidence: result.confidence || 0,
         totalAmount: result.amount || 0,
         currency: result.currency,
+        gstInfo: result.gstInfo,
         rawData: receiptText, 
         imageDataUri: dataUri,
       };
@@ -163,7 +164,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
     const reader = new FileReader();
     reader.onloadend = () => {
       const dataUri = reader.result as string;
-      processImage(dataUri, userEmail);
+      processImage(dataUri);
     };
     reader.readAsDataURL(file);
   };
@@ -190,7 +191,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         if (context) {
             context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
             const dataUri = canvas.toDataURL('image/png');
-            processImage(dataUri, userEmail);
+            processImage(dataUri);
             setIsCameraDialogOpen(false);
         }
     }

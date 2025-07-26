@@ -5,22 +5,27 @@ import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetS
 import { type AnalyzeExpensesOutput } from '@/ai/flows/expense-analysis-dashboard';
 import { Timestamp } from 'firebase/firestore';
 
+export interface GstInfo {
+    gstNumber?: string;
+    gstAmount?: number;
+}
+
 export interface ExpenseItem {
   item: string;
   price: number;
   quantity: number;
-  // timestamp= Timestamp;
-
+  expiryDate?: string;
 }
 
 export interface Receipt {
   id: string;
   imageDataUri: string;
   text: string;
-  category: 'grocery' | 'dining' | 'fashion' | 'travel' | 'other';
+  category: 'grocery' | 'dining' | 'fashion' | 'travel' | 'utilities' | 'inventory purchasing' | 'stationery' | 'maintenance' | 'other';
   amount: number;
   currency: string;
   items: ExpenseItem[];
+  gstInfo?: GstInfo;
 }
 
 type UsageType = 'personal' | 'business';

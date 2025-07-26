@@ -19,6 +19,7 @@ const CategorizeExpenseInputSchema = z.object({
       "A photo of a receipt, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
   receiptText: z.string().describe('The extracted text from the receipt.'),
+  usageType: z.enum(['personal', 'business']).describe('The usage type selected by the user.'),
 });
 export type CategorizeExpenseInput = z.infer<typeof CategorizeExpenseInputSchema>;
 
@@ -26,11 +27,17 @@ const ExpenseItemSchema = z.object({
     item: z.string().describe('The name of the individual item.'),
     price: z.number().describe('The price of the item.'),
     quantity: z.number().describe('The quantity of the item. Default to 1 if not specified.'),
+    expiryDate: z.string().optional().describe('The expiry date of the item in YYYY-MM-DD format, if available.'),
+});
+
+const GstInfoSchema = z.object({
+    gstNumber: z.string().optional().describe('The GST Identification Number found on the receipt.'),
+    gstAmount: z.number().optional().describe('The total GST amount paid.'),
 });
 
 const CategorizeExpenseOutputSchema = z.object({
   category: z
-    .enum(['grocery', 'dining', 'fashion', 'travel', 'other'])
+    .enum(['grocery', 'dining', 'fashion', 'travel', 'utilities', 'inventory purchasing', 'stationery', 'maintenance', 'other'])
     .describe('The category of the expense.'),
   confidence: z
     .number()
@@ -38,6 +45,7 @@ const CategorizeExpenseOutputSchema = z.object({
   amount: z.number().describe('The total amount of the expense.'),
   currency: z.string().describe('The ISO 4217 currency code of the expense (e.g., USD, EUR).'),
   items: z.array(ExpenseItemSchema).describe('A list of all individual items, their prices, and quantities found on the receipt.'),
+  gstInfo: GstInfoSchema.optional().describe('GST related information, if applicable for business use.'),
 });
 export type CategorizeExpenseOutput = z.infer<typeof CategorizeExpenseOutputSchema>;
 
@@ -51,9 +59,9 @@ const prompt = ai.definePrompt({
   output: {schema: CategorizeExpenseOutputSchema},
   prompt: `You are an expert expense categorizer and data extractor with multi-lingual capabilities.
 
-You will be provided with the text and an image of a receipt. The receipt can be in any language. Your task is to determine the total expense amount.
+You will be provided with the text and an image of a receipt, and a usage type ('personal' or 'business'). Your task is to extract all relevant details.
 
-You MUST follow this logic:
+You MUST follow this logic for amount calculation:
 1.  Analyze the receipt content.
 2.  **IF** the receipt contains a clear breakdown of individual items with quantities and prices:
     *   You MUST calculate the total amount yourself. Sum the result of (price * quantity) for every single item.
@@ -62,15 +70,22 @@ You MUST follow this logic:
 3.  **ELSE IF** the receipt does NOT have a clear breakdown of line items:
     *   You MUST find and extract the final total amount printed on the receipt.
     *   Use this extracted value for the 'amount' field.
-4.  Identify the currency from its symbol or code and determine its three-letter ISO 4217 code.
-5.  If available, extract each line item, its price, and quantity. If quantity is not mentioned, assume it is 1.
-6.  Categorize the expense into 'grocery', 'dining', 'fashion', 'travel', or 'other'.
-7.  Provide a confidence level (0-1) for your categorization.
+
+Extraction and Categorization Logic:
+1.  Identify the currency from its symbol or code and determine its three-letter ISO 4217 code.
+2.  Extract each line item, its price, and quantity. If quantity is not mentioned, assume it is 1.
+3.  **If an expiry date is present for an item, extract it in YYYY-MM-DD format.**
+4.  Based on the 'usageType', categorize the expense.
+    *   If 'personal': use categories like 'grocery', 'dining', 'fashion', 'travel', or 'other'.
+    *   If 'business': use categories like 'utilities', 'inventory purchasing', 'stationery', 'maintenance', or 'other'.
+5.  **If 'business' usage and GST information (GSTIN, GST amount) is present, you MUST extract it.**
+6.  Provide a confidence level (0-1) for your categorization.
 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}
+Usage Type: {{{usageType}}}
 
-Provide the output in the specified format. Your primary responsibility is to choose the correct method for determining the total amount based on the receipt's content.`,
+Provide the output in the specified JSON format. Your primary responsibility is to choose the correct method for determining the total amount and to categorize based on the provided usage type.`,
 });
 
 const categorizeExpenseFlow = ai.defineFlow(

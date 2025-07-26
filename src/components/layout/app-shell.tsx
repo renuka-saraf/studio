@@ -12,6 +12,9 @@ import {
   LogOut,
   Menu,
   Split,
+  Briefcase,
+  FileText,
+  Percent,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -37,15 +40,23 @@ import { ScanalyzeLogo } from '../icons/logo';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { userEmail, logout } = useReceipts();
+  const { userEmail, logout, usageType } = useReceipts();
   const [isOpen, setIsOpen] = React.useState(true);
 
-  const menuItems = [
+  const baseMenuItems = [
     { href: '/', label: 'Scan Receipt', icon: Home },
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/passes', label: 'Passes', icon: Ticket },
     { href: '/split-expense', label: 'Split Expense', icon: Split },
   ];
+
+  const businessMenuItems = [
+    { href: '/inventory', label: 'Inventory', icon: Briefcase },
+    { href: '/tax-report', label: 'Tax Report', icon: FileText },
+    { href: '/offers', label: 'Offers', icon: Percent },
+  ];
+
+  const menuItems = usageType === 'business' ? [...baseMenuItems, ...businessMenuItems] : baseMenuItems;
 
   const isAuthenticated = !!userEmail;
 
