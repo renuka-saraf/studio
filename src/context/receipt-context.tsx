@@ -5,6 +5,11 @@ import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetS
 import { type AnalyzeExpensesOutput } from '@/ai/flows/expense-analysis-dashboard';
 import { sendAuthPin } from '@/ai/flows/send-auth-pin';
 
+export interface ExpenseItem {
+  item: string;
+  price: number;
+}
+
 export interface Receipt {
   id: string;
   imageDataUri: string;
@@ -12,6 +17,7 @@ export interface Receipt {
   category: 'grocery' | 'dining' | 'fashion' | 'travel' | 'other';
   amount: number;
   currency: string;
+  items: ExpenseItem[];
 }
 
 interface ReceiptContextType {

@@ -22,6 +22,11 @@ const CategorizeExpenseInputSchema = z.object({
 });
 export type CategorizeExpenseInput = z.infer<typeof CategorizeExpenseInputSchema>;
 
+const ExpenseItemSchema = z.object({
+    item: z.string().describe('The name of the individual item.'),
+    price: z.number().describe('The price of the item.'),
+});
+
 const CategorizeExpenseOutputSchema = z.object({
   category: z
     .enum(['grocery', 'dining', 'fashion', 'travel', 'other'])
@@ -31,6 +36,7 @@ const CategorizeExpenseOutputSchema = z.object({
     .describe('The confidence level of the categorization (0-1).'),
   amount: z.number().describe('The total amount of the expense.'),
   currency: z.string().describe('The ISO 4217 currency code of the expense (e.g., USD, EUR).'),
+  items: z.array(ExpenseItemSchema).describe('A list of all individual items and their prices found on the receipt.'),
 });
 export type CategorizeExpenseOutput = z.infer<typeof CategorizeExpenseOutputSchema>;
 
@@ -45,13 +51,14 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert expense categorizer and data extractor.
 
 You will be provided with the text extracted from a receipt and an image of the receipt. You must perform the following tasks:
-1.  Categorize the expense into one of the following categories: 'grocery', 'dining', 'fashion', 'travel', or 'other'.
-2.  If the receipt contains items like 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato', 'potato', 'sugar', or other raw food ingredients, it should be categorized as 'grocery'.
-3.  If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
-4.  If the receipt is from a hotel or for an airline ticket, it must be categorized as 'travel'.
-5.  Provide a confidence level for your categorization, from 0 to 1.
-6.  Extract the total amount from the receipt. This is usually the largest number at the end of the receipt.
-7.  Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP).
+1.  Extract each individual line item from the receipt along with its price. Populate the 'items' array with these details.
+2.  Categorize the expense into one of the following categories: 'grocery', 'dining', 'fashion', 'travel', or 'other'.
+3.  If the receipt contains items like 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato', 'potato', 'sugar', or other raw food ingredients, it should be categorized as 'grocery'.
+4.  If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
+5.  If the receipt is from a hotel or for an airline ticket, it must be categorized as 'travel'.
+6.  Provide a confidence level for your categorization, from 0 to 1.
+7.  Extract the total amount from the receipt. This is usually the largest number at the end of the receipt.
+8.  Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP).
 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}

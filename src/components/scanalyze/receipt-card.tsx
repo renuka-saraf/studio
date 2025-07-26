@@ -7,11 +7,12 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Utensils, ShoppingCart, Loader2, Sparkles, Plane, Shirt, MoreHorizontal, Wheat } from "lucide-react";
+import { Utensils, ShoppingCart, Loader2, Sparkles, Plane, Shirt, MoreHorizontal, Wheat, SplitSquareHorizontal } from "lucide-react";
 import type { Receipt } from "@/context/receipt-context";
 import { mealPlanMaximizer } from "@/ai/flows/meal-plan-maximizer";
 import { quickCommerceReorder } from "@/ai/flows/quick-commerce-reorder";
 import { Textarea } from "@/components/ui/textarea";
+import { SplitExpenseDialog } from "./split-expense-dialog";
 
 interface ReceiptCardProps {
   receipt: Receipt;
@@ -28,6 +29,7 @@ const categoryIcons: { [key: string]: JSX.Element } = {
 export function ReceiptCard({ receipt }: ReceiptCardProps) {
   const [isMaximizerOpen, setIsMaximizerOpen] = useState(false);
   const [isReorderOpen, setIsReorderOpen] = useState(false);
+  const [isSplitExpenseOpen, setIsSplitExpenseOpen] = useState(false);
   const [maximizerResult, setMaximizerResult] = useState("");
   const [reorderResult, setReorderResult] = useState<{ message: string; reorderLink?: string; } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,19 +113,31 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
             {new Date(parseInt(receipt.id)).toLocaleString()}
           </p>
         </CardContent>
-        {receipt.category === "grocery" && (
-          <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row gap-2">
-            <Button className="w-full" variant="outline" onClick={() => setIsMaximizerOpen(true)}>
-              <Sparkles className="mr-2 h-4 w-4 text-accent" />
-              Meal Plan
-            </Button>
-            <Button className="w-full" onClick={() => { setIsReorderOpen(true); handleReorder(); }}>
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Reorder
-            </Button>
-          </CardFooter>
-        )}
+        <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row gap-2">
+          <Button className="w-full" variant="outline" onClick={() => setIsSplitExpenseOpen(true)}>
+            <SplitSquareHorizontal className="mr-2 h-4 w-4" />
+            Split Expense
+          </Button>
+          {receipt.category === "grocery" && (
+            <>
+              <Button className="w-full" variant="outline" onClick={() => setIsMaximizerOpen(true)}>
+                <Sparkles className="mr-2 h-4 w-4 text-accent" />
+                Meal Plan
+              </Button>
+              <Button className="w-full" onClick={() => { setIsReorderOpen(true); handleReorder(); }}>
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Reorder
+              </Button>
+            </>
+          )}
+        </CardFooter>
       </Card>
+
+      <SplitExpenseDialog
+        isOpen={isSplitExpenseOpen}
+        onClose={() => setIsSplitExpenseOpen(false)}
+        receipt={receipt}
+      />
 
       <Dialog open={isMaximizerOpen} onOpenChange={(open) => { setIsMaximizerOpen(open); if(!open) setMaximizerResult('')}}>
         <DialogContent>

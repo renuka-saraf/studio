@@ -92,6 +92,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         category: result.category,
         amount: result.amount,
         currency: result.currency,
+        items: result.items || [],
       };
       
       addReceipt(newReceipt);
