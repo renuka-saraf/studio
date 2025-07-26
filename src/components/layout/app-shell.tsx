@@ -37,7 +37,7 @@ import { ScanalyzeLogo } from '../icons/logo';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { usageMode, logout } = useReceipts();
+  const { userEmail, logout } = useReceipts();
   const [isOpen, setIsOpen] = React.useState(true);
 
   const menuItems = [
@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/split-expense', label: 'Split Expense', icon: Split },
   ];
 
-  const isAuthenticated = !!usageMode;
+  const isAuthenticated = !!userEmail;
 
   return (
     <SidebarProvider>

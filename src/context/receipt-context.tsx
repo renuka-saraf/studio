@@ -23,8 +23,6 @@ export interface Receipt {
   items: ExpenseItem[];
 }
 
-type UsageMode = 'personal' | 'business' | null;
-
 interface ReceiptContextType {
   receipts: Receipt[];
   addReceipt: (receipt: Omit<Receipt, 'id'>) => void;
@@ -34,10 +32,9 @@ interface ReceiptContextType {
   dashboardAnalysis: AnalyzeExpensesOutput | null;
   setDashboardAnalysis: Dispatch<SetStateAction<AnalyzeExpensesOutput | null>>;
   isLoading: boolean;
-  usageMode: UsageMode;
-  setUsageMode: (mode: UsageMode) => void;
-  logout: () => void;
   userEmail: string | null;
+  login: (email: string) => void;
+  logout: () => void;
 }
 
 const ReceiptContext = createContext<ReceiptContextType | undefined>(undefined);
@@ -46,20 +43,19 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [monthlyLimit, setMonthlyLimit] = useState<number | null>(1000);
   const [dashboardAnalysis, setDashboardAnalysis] = useState<AnalyzeExpensesOutput | null>(null);
-  const [usageMode, setUsageModeState] = useState<UsageMode>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const addReceipt = (receiptData: Omit<Receipt, 'id'>) => {
     const newReceipt = { ...receiptData, id: Date.now().toString() };
     setReceipts((prev) => [...prev, newReceipt]);
   };
   
-  const setUsageMode = (mode: UsageMode) => {
-    setUsageModeState(mode);
+  const login = (email: string) => {
+    setUserEmail(email);
   }
   
   const logout = () => {
-      setUsageModeState(null);
-      // Optionally clear other state on logout
+      setUserEmail(null);
       setReceipts([]);
       setDashboardAnalysis(null);
   }
@@ -68,9 +64,6 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
     return receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
   }, [receipts]);
   
-  // The userEmail can be derived from the usage mode for simplified identification
-  const userEmail = usageMode ? `${usageMode}-user@example.com` : null;
-
   const value = {
     receipts,
     addReceipt,
@@ -80,10 +73,9 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
     dashboardAnalysis,
     setDashboardAnalysis,
     isLoading: false,
-    usageMode,
-    setUsageMode,
-    logout,
     userEmail,
+    login,
+    logout,
   };
 
   return (
