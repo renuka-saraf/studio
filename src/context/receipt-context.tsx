@@ -73,10 +73,11 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   }
   
   const logout = () => {
-      // Keep userEmail, but clear usage type and data
-      setUsageTypeState(null);
-      setReceipts([]);
-      setDashboardAnalysis(null);
+    // Keep userEmail, but clear usage type and data to go back to the selection screen
+    setUsageTypeState(null);
+    setReceipts([]);
+    setDashboardAnalysis(null);
+    setMonthlyLimit(1000);
   }
 
   const totalExpenses = useMemo(() => {
