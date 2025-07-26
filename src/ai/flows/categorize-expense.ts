@@ -52,7 +52,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert expense categorizer and data extractor with multi-lingual capabilities. Your primary task is to calculate the total amount from the line items, not to just read it from the receipt.
 
 You will be provided with the text extracted from a receipt and an image of the receipt. The receipt can be in any language, including Hindi. You must perform the following tasks in order:
-1.  **Detect Language**: First, identify the language of the receipt.
+1.  **Detect Language and Currency**: First, identify the language of the receipt. Then, identify the currency from its symbol (e.g., ₹, $, €) or code (e.g., INR, USD, EUR) and determine its three-letter ISO 4217 code.
 2.  **Extract Line Items**: Extract each individual line item from the receipt along with its price and quantity. If quantity is not explicitly mentioned for an item, assume it is 1. Ensure you correctly interpret numbers and item names regardless of the language. Populate the 'items' array with these details.
 3.  **Calculate Subtotal**: Calculate a subtotal by summing the result of (price * quantity) for every item in the 'items' list.
 4.  **Identify Charges/Discounts**: Identify any discounts, taxes, tips, or other charges on the receipt.
@@ -62,7 +62,6 @@ You will be provided with the text extracted from a receipt and an image of the 
     - If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
     - If the receipt is from a hotel or for an airline ticket, it must be categorized as 'travel'.
 7.  **Confidence**: Provide a confidence level for your categorization, from 0 to 1.
-8.  **Currency**: Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, INR).
 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}
