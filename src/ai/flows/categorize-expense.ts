@@ -35,7 +35,7 @@ const CategorizeExpenseOutputSchema = z.object({
   confidence: z
     .number()
     .describe('The confidence level of the categorization (0-1).'),
-  amount: z.number().describe('The total amount of the expense.'),
+  amount: z.number().describe('The total amount of the expense, calculated by summing line items and adjusting for taxes/discounts.'),
   currency: z.string().describe('The ISO 4217 currency code of the expense (e.g., USD, EUR).'),
   items: z.array(ExpenseItemSchema).describe('A list of all individual items, their prices, and quantities found on the receipt.'),
 });
@@ -49,13 +49,13 @@ const prompt = ai.definePrompt({
   name: 'categorizeExpensePrompt',
   input: {schema: CategorizeExpenseInputSchema},
   output: {schema: CategorizeExpenseOutputSchema},
-  prompt: `You are an expert expense categorizer and data extractor.
+  prompt: `You are an expert expense categorizer and data extractor. Your primary task is to calculate the total amount from the line items, not to just read it from the receipt.
 
-You will be provided with the text extracted from a receipt and an image of the receipt. You must perform the following tasks:
+You will be provided with the text extracted from a receipt and an image of the receipt. You must perform the following tasks in order:
 1.  Extract each individual line item from the receipt along with its price and quantity. If quantity is not explicitly mentioned for an item, assume it is 1. Populate the 'items' array with these details.
-2.  Calculate the subtotal by summing the result of (price * quantity) for every item in the 'items' list.
+2.  Calculate a subtotal by summing the result of (price * quantity) for every item in the 'items' list.
 3.  Identify any discounts, taxes, tips, or other charges on the receipt.
-4.  Calculate the final total amount by starting with the subtotal, subtracting any discounts, and adding any taxes or other fees. This calculated value should be the final 'amount'. Do NOT simply extract the total from the receipt text.
+4.  Calculate the final total amount by starting with the subtotal, subtracting any discounts, and adding any taxes or other fees. This calculated value is the **ONLY** value you should use for the 'amount' field in the output. Do NOT simply extract the total from the receipt text.
 5.  Categorize the expense into one of the following categories: 'grocery', 'dining', 'fashion', 'travel', or 'other'.
 6.  If the receipt contains items like 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato', 'potato', 'sugar', or other raw food ingredients, it should be categorized as 'grocery'.
 7.  If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
@@ -66,7 +66,7 @@ You will be provided with the text extracted from a receipt and an image of the 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}
 
-Provide the output in the specified format. The 'amount' field MUST be the result of your own calculation.`,
+Provide the output in the specified format. The 'amount' field MUST be the result of your own calculation. For example, if items total 800 and tax is 110, the amount must be 910.`,
 });
 
 const categorizeExpenseFlow = ai.defineFlow(
