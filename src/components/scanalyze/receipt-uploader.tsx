@@ -14,6 +14,9 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+
 
 interface ReceiptUploaderProps {
   isProcessing: boolean;
@@ -94,7 +97,74 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         currency: result.currency,
         items: result.items || [],
       };
-      
+      const db = getFirestore(); // Get Firestore instance
+      const { userEmail } = useReceipts(); // Get user email from the hook
+
+      if (!userEmail) {
+        console.error("User email is not available. Cannot save data to Firebase.");
+        // Optionally, show an error message to the user
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Could not save data. Please ensure you are logged in.",
+        });
+        return; // Stop processing if user email is not available
+      }
+
+      // Prepare receipt data for Firestore
+      const receiptDataForFirestore = {
+        userEmail: userEmail,
+        // date: result.date_r || new Date(), // Use extracted date if available, otherwise use current date
+        timestamp: new Date(), // Keep a timestamp of when it was added
+        items: result.items || [],
+        category: result.category,
+        confidence: result.confidence || 0, // Default confidence to 0 if not available
+        totalAmount: result.amount || 0, // Default amount to 0 if not available
+        rawData: receiptText, // Store raw text
+        imageUrl: dataUri, // Store image data URI (consider storing image in Storage instead for larger files)
+      };
+
+      try {
+        // Add receipt document to Firestore
+        const docRef = await addDoc(collection(db, `users/${userEmail}/receipts`), receiptDataForFirestore);
+        console.log('Receipt document written with ID: ', docRef.id);
+
+        // Update spending summary
+        const spendingSummaryRef = doc(db, `users/${userEmail}/spendingSummary`, result.category);
+        await setDoc(spendingSummaryRef, {
+          userEmail: userEmail,
+          category: result.category,
+          totalSpent: increment(result.amount || 0),
+          lastUpdated: new Date(),
+        }, { merge: true }); // Use merge: true to update existing document or create if it doesn't exist
+        console.log('Spending summary updated for category: ', result.category);
+
+        // Add the receipt to the local state as before
+        const newReceipt: Omit<Receipt, 'id'> = {
+          imageDataUri: dataUri,
+          text: receiptText,
+          category: result.category,
+          amount: result.amount,
+          currency: result.currency, // Assuming currency is available in result
+          items: result.items || [],
+          // Note: The local state Receipt type might need to be updated to include date and timestamp
+        };
+        addReceipt(newReceipt);
+
+
+        toast({
+          title: "Receipt Categorized!",
+          description: `Expense added to \'${result.category}\' with ${Math.round((result.confidence || 0) * 100)}% confidence.`,
+        });
+
+      } catch (error) {
+        console.error("Error saving data to Firebase:", error);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong saving your data.",
+          description: "Failed to save receipt data to the database. Please try again.",
+        });
+      }
       addReceipt(newReceipt);
       toast({
         title: "Receipt Categorized!",

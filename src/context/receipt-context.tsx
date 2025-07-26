@@ -4,11 +4,14 @@
 import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from 'react';
 import { type AnalyzeExpensesOutput } from '@/ai/flows/expense-analysis-dashboard';
 import { sendAuthPin } from '@/ai/flows/send-auth-pin';
+import { Timestamp } from 'firebase/firestore';
 
 export interface ExpenseItem {
   item: string;
   price: number;
   quantity: number;
+  // timestamp= Timestamp;
+
 }
 
 export interface Receipt {
@@ -34,6 +37,7 @@ interface ReceiptContextType {
   login: (email: string, pin: string) => boolean;
   logout: () => void;
   sendPin: (email: string) => Promise<boolean>;
+  userEmail: string | null; 
 }
 
 const ReceiptContext = createContext<ReceiptContextType | undefined>(undefined);
@@ -106,6 +110,7 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     sendPin,
+    userEmail,
   };
 
   return (

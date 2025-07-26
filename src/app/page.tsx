@@ -1,11 +1,40 @@
 
 "use client";
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from 'firebase/app';
+// TODO: Add SDKs for other Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration (paste the one you copied)
+const firebaseConfig = {
+  apiKey: "AIzaSyC...",
+  authDomain: "scanalyze-8x740.firebaseapp.com",
+  projectId: "scanalyze-8x740",
+  storageBucket: "scanalyze-8x740.appspot.com",
+  messagingSenderId: "213425288049",
+  appId: "1:213425288049:web:a1b2c3d4e5f6g7h8i9j0",
+  // measurementId: "G-XXXXXXXXXX"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+// Get a reference to the Firestore service
+const db = getFirestore(app);
+console.log("Firestore database reference obtained!");
+
+console.log("Firebase app initialized!");
+
 import { useState } from 'react';
 import { useReceipts } from '@/context/receipt-context';
 import { EmailAuth } from '@/components/scanalyze/email-auth';
 import { ReceiptUploader } from '@/components/scanalyze/receipt-uploader';
 import { ReceiptList } from '@/components/scanalyze/receipt-list';
+import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
+
+// import { getFirestore,collection,addDoc } from 'firebase/firestore';
+// import { collection, addDoc } from 'firebase/firestore'; // Assuming 'db' is already defined from getFirestore(app)
 
 export default function HomePage() {
   const { isAuthenticated } = useReceipts();
