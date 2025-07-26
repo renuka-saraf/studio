@@ -51,12 +51,9 @@ export function EmailAuth() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
       <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <div className="flex justify-center items-center gap-3 mb-2">
-            <ScanalyzeLogo className="h-10 w-10" />
-            <CardTitle className="text-3xl font-bold tracking-tight font-headline">Scanalyze</CardTitle>
-          </div>
-          <CardDescription>
+        <CardHeader className="text-center items-center">
+            <ScanalyzeLogo className="h-12 w-auto" />
+          <CardDescription className="pt-2">
             {pinSent ? 'Enter the PIN sent to your email' : 'Sign in with your email to continue'}
           </CardDescription>
         </CardHeader>
