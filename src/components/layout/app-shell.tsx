@@ -33,7 +33,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useReceipts } from '@/context/receipt-context';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { ScanalyzeLogo } from '../icons/logo';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-2 flex-1">
                         <Button variant="ghost" size="icon" asChild>
                             <Link href="/">
-                                <ScanLine className="h-6 w-6 text-primary" />
+                                <ScanalyzeLogo className="h-6 w-6" />
                                 <span className="sr-only">Scanalyze</span>
                             </Link>
                         </Button>
@@ -96,7 +96,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon" asChild>
                         <Link href="/">
-                            <ScanLine className="h-6 w-6 text-primary" />
+                            <ScanalyzeLogo className="h-6 w-6" />
                             <span className="sr-only">Scanalyze</span>
                         </Link>
                     </Button>
