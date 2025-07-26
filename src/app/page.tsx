@@ -6,6 +6,7 @@ import { useReceipts } from '@/context/receipt-context';
 import { ReceiptUploader } from '@/components/scanalyze/receipt-uploader';
 import { ReceiptList } from '@/components/scanalyze/receipt-list';
 import { EmailAuth } from '@/components/scanalyze/email-auth';
+import { UsageSelection } from '@/components/scanalyze/usage-selection';
 import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
@@ -38,11 +39,15 @@ if (getApps().length === 0) {
 
 
 export default function HomePage() {
-  const { userEmail } = useReceipts();
+  const { userEmail, usageType } = useReceipts();
   const [isProcessing, setIsProcessing] = useState(false);
 
   if (!userEmail) {
     return <EmailAuth />;
+  }
+
+  if (!usageType) {
+    return <UsageSelection />;
   }
 
   return (

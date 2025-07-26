@@ -23,6 +23,8 @@ export interface Receipt {
   items: ExpenseItem[];
 }
 
+type UsageType = 'personal' | 'business';
+
 interface ReceiptContextType {
   receipts: Receipt[];
   addReceipt: (receipt: Omit<Receipt, 'id'>) => void;
@@ -35,6 +37,8 @@ interface ReceiptContextType {
   userEmail: string | null;
   login: (email: string) => void;
   logout: () => void;
+  usageType: UsageType | null;
+  setUsageType: (type: UsageType) => void;
 }
 
 const ReceiptContext = createContext<ReceiptContextType | undefined>(undefined);
@@ -44,6 +48,7 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   const [monthlyLimit, setMonthlyLimit] = useState<number | null>(1000);
   const [dashboardAnalysis, setDashboardAnalysis] = useState<AnalyzeExpensesOutput | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [usageType, setUsageTypeState] = useState<UsageType | null>(null);
 
   const addReceipt = (receiptData: Omit<Receipt, 'id'>) => {
     const newReceipt = { ...receiptData, id: Date.now().toString() };
@@ -53,9 +58,14 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   const login = (email: string) => {
     setUserEmail(email);
   }
+
+  const setUsageType = (type: UsageType) => {
+    setUsageTypeState(type);
+  }
   
   const logout = () => {
       setUserEmail(null);
+      setUsageTypeState(null);
       setReceipts([]);
       setDashboardAnalysis(null);
   }
@@ -76,6 +86,8 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
     userEmail,
     login,
     logout,
+    usageType,
+    setUsageType,
   };
 
   return (
