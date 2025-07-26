@@ -14,17 +14,17 @@ import {z} from 'genkit';
 const webSearch = ai.defineTool(
   {
     name: 'webSearch',
-    description: 'Performs a Google web search to answer user questions.',
+    description: 'Performs a Google web search to answer user questions when information is not present in the receipt data.',
     inputSchema: z.object({
       query: z.string().describe('The search query.'),
     }),
-    outputSchema: z.string(),
+    outputSchema: z.string().describe('The search results from the web.'),
   },
   async (input) => {
-    // In a real application, you would implement a web search here.
-    // For this example, we'll return a placeholder.
-    console.log(`Web search for: ${input.query}`);
-    return `Results for "${input.query}" from the web.`;
+    // In a real production application, you would implement a call to a web search API here (e.g., Google Custom Search API).
+    // For this prototype, we will return a placeholder response to simulate the search functionality.
+    console.log(`Simulating web search for: ${input.query}`);
+    return `Simulated web search results for "${input.query}". In a real app, this would contain actual data from the web.`;
   }
 );
 
