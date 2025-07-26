@@ -8,6 +8,7 @@ import { sendAuthPin } from '@/ai/flows/send-auth-pin';
 export interface ExpenseItem {
   item: string;
   price: number;
+  quantity: number;
 }
 
 export interface Receipt {

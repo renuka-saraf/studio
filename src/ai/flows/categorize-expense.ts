@@ -16,7 +16,7 @@ const CategorizeExpenseInputSchema = z.object({
   receiptDataUri: z
     .string()
     .describe(
-      "A photo of a receipt, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A photo of a receipt, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
   receiptText: z.string().describe('The extracted text from the receipt.'),
 });
@@ -25,6 +25,7 @@ export type CategorizeExpenseInput = z.infer<typeof CategorizeExpenseInputSchema
 const ExpenseItemSchema = z.object({
     item: z.string().describe('The name of the individual item.'),
     price: z.number().describe('The price of the item.'),
+    quantity: z.number().describe('The quantity of the item. Default to 1 if not specified.'),
 });
 
 const CategorizeExpenseOutputSchema = z.object({
@@ -36,7 +37,7 @@ const CategorizeExpenseOutputSchema = z.object({
     .describe('The confidence level of the categorization (0-1).'),
   amount: z.number().describe('The total amount of the expense.'),
   currency: z.string().describe('The ISO 4217 currency code of the expense (e.g., USD, EUR).'),
-  items: z.array(ExpenseItemSchema).describe('A list of all individual items and their prices found on the receipt.'),
+  items: z.array(ExpenseItemSchema).describe('A list of all individual items, their prices, and quantities found on the receipt.'),
 });
 export type CategorizeExpenseOutput = z.infer<typeof CategorizeExpenseOutputSchema>;
 
@@ -51,7 +52,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert expense categorizer and data extractor.
 
 You will be provided with the text extracted from a receipt and an image of the receipt. You must perform the following tasks:
-1.  Extract each individual line item from the receipt along with its price. Populate the 'items' array with these details.
+1.  Extract each individual line item from the receipt along with its price and quantity. If quantity is not explicitly mentioned for an item, assume it is 1. Populate the 'items' array with these details.
 2.  Categorize the expense into one of the following categories: 'grocery', 'dining', 'fashion', 'travel', or 'other'.
 3.  If the receipt contains items like 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato', 'potato', 'sugar', or other raw food ingredients, it should be categorized as 'grocery'.
 4.  If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
