@@ -34,45 +34,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    if (isCameraDialogOpen) {
-      const getCameraPermission = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-          setHasCameraPermission(true);
-        } catch (error) {
-          console.error('Error accessing camera:', error);
-          setHasCameraPermission(false);
-          toast({
-            variant: 'destructive',
-            title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings.',
-          });
-        }
-      };
-      getCameraPermission();
-    } else {
-        const stream = videoRef.current?.srcObject as MediaStream;
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-    }
-  }, [isCameraDialogOpen, toast]);
-
-  const handleFile = (file: File) => {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const dataUri = reader.result as string;
-      processImage(dataUri);
-    };
-    reader.readAsDataURL(file);
-  };
-  
-  const processImage = async (dataUri: string) => {
+  const processImage = async (dataUri: string, userEmail: string | null) => {
     setIsProcessing(true);
     setShowScanner(true);
     setPreview(dataUri);
@@ -167,6 +129,45 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
     }
   };
 
+
+  useEffect(() => {
+    if (isCameraDialogOpen) {
+      const getCameraPermission = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+          setHasCameraPermission(true);
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setHasCameraPermission(false);
+          toast({
+            variant: 'destructive',
+            title: 'Camera Access Denied',
+            description: 'Please enable camera permissions in your browser settings.',
+          });
+        }
+      };
+      getCameraPermission();
+    } else {
+        const stream = videoRef.current?.srcObject as MediaStream;
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    }
+  }, [isCameraDialogOpen, toast]);
+
+  const handleFile = (file: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUri = reader.result as string;
+      processImage(dataUri, userEmail);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const onDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles && acceptedFiles.length > 0) {
       handleFile(acceptedFiles[0]);
@@ -189,7 +190,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         if (context) {
             context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
             const dataUri = canvas.toDataURL('image/png');
-            processImage(dataUri);
+            processImage(dataUri, userEmail);
             setIsCameraDialogOpen(false);
         }
     }
