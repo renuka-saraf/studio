@@ -8,7 +8,6 @@ import {
   Home,
   LayoutDashboard,
   ScanLine,
-  Factory,
   Ticket,
   LogOut,
   Menu,
@@ -44,7 +43,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const menuItems = [
     { href: '/', label: 'Scan Receipt', icon: Home },
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/inventory', label: 'Inventory', icon: Factory },
     { href: '/passes', label: 'Passes', icon: Ticket },
     { href: '/split-expense', label: 'Split Expense', icon: Split },
   ];
