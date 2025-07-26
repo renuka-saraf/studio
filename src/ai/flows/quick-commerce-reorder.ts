@@ -41,20 +41,22 @@ const quickCommerceReorderPrompt = ai.definePrompt({
   name: 'quickCommerceReorderPrompt',
   input: {schema: QuickCommerceReorderInputSchema},
   output: {schema: QuickCommerceReorderOutputSchema},
-  prompt: `You are a helpful AI assistant designed to analyze grocery receipts and provide users with a convenient way to reorder their items through a third-party quick commerce application.
+  prompt: `You are a helpful AI assistant designed to analyze grocery receipts and provide users with a convenient way to reorder their items through the quick commerce application StarQuik (https://www.starquik.com/).
 
   Analyze the following receipt text:
   {{{receiptText}}}
 
-  Determine if a reorder link can be generated based on the items listed in the receipt.
+  Your task is to extract the item names from the receipt and construct a search URL for starquik.com.
 
-  If a reorder link can be generated:
-  - Create a URL that deep links to the quick commerce application with the items from the receipt added to the cart. For this prototype, you can use a placeholder URL like "https://example.com/cart?items=...". If you are unable to construct a valid url, do not return one.
-  - Set the message to "Your items are ready for reorder!"
+  1.  Identify and list the grocery items from the receipt text.
+  2.  Combine the item names into a single string, with each item separated by a space.
+  3.  Construct a URL using the format: \`https://www.starquik.com/search?q=ITEM1+ITEM2+ITEM3\`. Ensure the query is properly URL-encoded (e.g., spaces become '+').
+  4.  Set the 'reorderLink' to this generated URL.
+  5.  Set the 'message' to "Your items are ready to be reordered on StarQuik. Click the link to search for them."
 
-  If a reorder link cannot be generated (e.g., items are unclear):
-  - Explain to the user that a reorder link is not available and state the reason.
-  - Try to extract the list of items from the receipt and show it to the user in the message.
+  If you cannot clearly identify any items from the receipt:
+  - Do not generate a reorderLink.
+  - Set the 'message' to "I couldn't identify the items from your receipt clearly enough to create a reorder link."
 
   Ensure that the response is clear, concise, and user-friendly.
   `,
