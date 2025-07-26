@@ -53,18 +53,20 @@ const prompt = ai.definePrompt({
 
 You will be provided with the text extracted from a receipt and an image of the receipt. You must perform the following tasks:
 1.  Extract each individual line item from the receipt along with its price and quantity. If quantity is not explicitly mentioned for an item, assume it is 1. Populate the 'items' array with these details.
-2.  Categorize the expense into one of the following categories: 'grocery', 'dining', 'fashion', 'travel', or 'other'.
-3.  If the receipt contains items like 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato', 'potato', 'sugar', or other raw food ingredients, it should be categorized as 'grocery'.
-4.  If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
-5.  If the receipt is from a hotel or for an airline ticket, it must be categorized as 'travel'.
-6.  Provide a confidence level for your categorization, from 0 to 1.
-7.  Extract the total amount from the receipt. This is usually the largest number at the end of the receipt.
-8.  Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP).
+2.  Calculate the subtotal by summing the result of (price * quantity) for every item in the 'items' list.
+3.  Identify any discounts, taxes, tips, or other charges on the receipt.
+4.  Calculate the final total amount by starting with the subtotal, subtracting any discounts, and adding any taxes or other fees. This calculated value should be the final 'amount'. Do NOT simply extract the total from the receipt text.
+5.  Categorize the expense into one of the following categories: 'grocery', 'dining', 'fashion', 'travel', or 'other'.
+6.  If the receipt contains items like 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato', 'potato', 'sugar', or other raw food ingredients, it should be categorized as 'grocery'.
+7.  If the receipt is from a restaurant or a cafe, it should be categorized as 'dining'.
+8.  If the receipt is from a hotel or for an airline ticket, it must be categorized as 'travel'.
+9.  Provide a confidence level for your categorization, from 0 to 1.
+10. Identify the currency of the expense and provide its three-letter ISO 4217 code (e.g., USD, EUR, GBP).
 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}
 
-Provide the output in the specified format.`,
+Provide the output in the specified format. The 'amount' field MUST be the result of your own calculation.`,
 });
 
 const categorizeExpenseFlow = ai.defineFlow(
