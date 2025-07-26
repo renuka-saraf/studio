@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, UserPlus, Users, Copy, Minus, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 
 interface SplitExpenseDialogProps {
@@ -169,8 +168,6 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
       toast({ title: "Copied to clipboard!" });
     }
   }
-
-  const renderFormattedPrice = (price: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(price);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
