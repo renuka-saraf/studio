@@ -15,21 +15,19 @@ export default function TaxReportPage() {
   const [report, setReport] = useState<TaxReportOutput | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const gstReceipts = receipts.filter(r => r.gstInfo && r.gstInfo.gstBreakdown && Object.keys(r.gstInfo.gstBreakdown).length > 0);
+  const gstReceipts = receipts.filter(r => r.gstInfo && r.gstInfo.gstBreakdown && r.gstInfo.gstBreakdown.length > 0);
 
   const fetchReport = () => {
     if (gstReceipts.length > 0) {
       startTransition(async () => {
         const reportInput = gstReceipts.map(r => ({
-          totalAmount: r.amount,
-          gstInfo: {
-            gstNumber: r.gstInfo?.gstNumber,
-            gstBreakdown: r.gstInfo?.gstBreakdown || {},
-          },
+          amount: r.amount,
+          gstInfo: r.gstInfo,
           id: r.id,
         }));
         try {
-          const result = await generateTaxReport(reportInput);
+          // The type assertion is safe because we've already filtered for receipts with gstInfo.
+          const result = await generateTaxReport(reportInput as any);
           setReport(result);
         } catch (error) {
           console.error("Failed to generate tax report:", error);

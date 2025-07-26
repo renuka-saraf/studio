@@ -3,11 +3,15 @@
 
 import { createContext, useContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from 'react';
 import { type AnalyzeExpensesOutput } from '@/ai/flows/expense-analysis-dashboard';
-import { Timestamp } from 'firebase/firestore';
+
+export interface GstBreakdownItem {
+  taxType: string;
+  amount: number;
+}
 
 export interface GstInfo {
     gstNumber?: string;
-    gstBreakdown?: Record<string, number>;
+    gstBreakdown?: GstBreakdownItem[];
 }
 
 export interface ExpenseItem {

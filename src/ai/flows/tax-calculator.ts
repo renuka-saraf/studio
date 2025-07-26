@@ -14,7 +14,7 @@ import { GstInfo, Receipt } from '@/context/receipt-context';
 
 
 // Define input/output types for the function, but DO NOT export the Zod schemas.
-export type TaxReportInput = Pick<Receipt, 'totalAmount' | 'gstInfo' | 'id'>[];
+export type TaxReportInput = Pick<Receipt, 'amount' | 'gstInfo' | 'id'>[];
 
 const TaxReportOutputSchema = z.object({
   summary: z
@@ -35,16 +35,23 @@ export async function generateTaxReport(receipts: TaxReportInput): Promise<TaxRe
 }
 
 // Internal Zod schema for the prompt, not exported.
+const GstBreakdownItemSchema = z.object({
+  taxType: z.string(),
+  amount: z.number(),
+});
+
+const GstInfoSchema = z.object({
+  gstNumber: z.string().optional(),
+  gstBreakdown: z.array(GstBreakdownItemSchema).optional(),
+});
+
 const TaxReportInputSchema = z.array(
-    z.object({
-      totalAmount: z.number(),
-      gstInfo: z.object({
-        gstNumber: z.string().optional(),
-        gstBreakdown: z.record(z.number()).optional().describe("A breakdown of different GST types and their amounts, e.g., {'CGST': 5, 'SGST': 5}"),
-      }),
-      id: z.string().describe('The date of the purchase as a stringified timestamp.'),
-    })
-  ).describe('An array of receipts containing GST information.');
+  z.object({
+    amount: z.number(),
+    gstInfo: GstInfoSchema.optional(),
+    id: z.string().describe('The date of the purchase as a stringified timestamp.'),
+  })
+).describe('An array of receipts containing GST information.');
 
 
 const prompt = ai.definePrompt({
@@ -64,7 +71,13 @@ Then, analyze the aggregated data and provide a concise, user-friendly 'summary'
 
 Here is the list of receipts:
 {{#each this}}
-- Date: {{this.id}}, Total: {{this.totalAmount}}, GSTIN: {{this.gstInfo.gstNumber}}, GST Breakdown: {{#each this.gstInfo.gstBreakdown}}{{@key}}: {{this}} {{/each}}
+- Date: {{this.id}}, Total: {{this.amount}}, GSTIN: {{this.gstInfo.gstNumber}}
+  {{#if this.gstInfo.gstBreakdown}}
+  GST Breakdown: 
+  {{#each this.gstInfo.gstBreakdown}}
+  - {{this.taxType}}: {{this.amount}}
+  {{/each}}
+  {{/if}}
 {{/each}}
 
 Generate the 'totalGstPaid', 'gstBreakdown' and the 'summary' and provide the output in the specified JSON format.`,
@@ -83,10 +96,10 @@ const taxReportFlow = ai.defineFlow(
 
     receipts.forEach(receipt => {
         if (receipt.gstInfo && receipt.gstInfo.gstBreakdown) {
-            for (const [key, value] of Object.entries(receipt.gstInfo.gstBreakdown)) {
-                totalGstPaid += value;
-                gstBreakdown[key] = (gstBreakdown[key] || 0) + value;
-            }
+            receipt.gstInfo.gstBreakdown.forEach(item => {
+                totalGstPaid += item.amount;
+                gstBreakdown[item.taxType] = (gstBreakdown[item.taxType] || 0) + item.amount;
+            });
         }
     });
 

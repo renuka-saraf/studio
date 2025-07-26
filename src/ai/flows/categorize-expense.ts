@@ -30,9 +30,14 @@ const ExpenseItemSchema = z.object({
     expiryDate: z.string().optional().describe('The expiry date of the item in YYYY-MM-DD format, if available.'),
 });
 
+const GstBreakdownItemSchema = z.object({
+  taxType: z.string().describe("The type of GST component, e.g., 'CGST', 'SGST', 'IGST'."),
+  amount: z.number().describe("The amount for this specific GST component."),
+});
+
 const GstInfoSchema = z.object({
     gstNumber: z.string().optional().describe('The GST Identification Number (GSTIN) found on the receipt.'),
-    gstBreakdown: z.record(z.number()).optional().describe("A breakdown of all GST components and their amounts, like {'CGST': 25.50, 'SGST': 25.50}. Extract all tax types mentioned."),
+    gstBreakdown: z.array(GstBreakdownItemSchema).optional().describe("A breakdown of all GST components and their amounts."),
 });
 
 const CategorizeExpenseOutputSchema = z.object({
@@ -78,7 +83,7 @@ Extraction and Categorization Logic:
 4.  Based on the 'usageType', categorize the expense.
     *   If 'personal': use categories like 'grocery', 'dining', 'fashion', 'travel', or 'other'.
     *   If 'business': use categories like 'utilities', 'inventory purchasing', 'stationery', 'maintenance', or 'other'.
-5.  **If 'business' usage and GST information is present, you MUST extract it.** This includes the GSTIN and a full breakdown of all GST components (CGST, SGST, IGST, etc.) into the 'gstBreakdown' field.
+5.  **If 'business' usage and GST information is present, you MUST extract it.** This includes the GSTIN. The 'gstBreakdown' field must be an array of objects, where each object contains a 'taxType' (e.g., "CGST") and its corresponding 'amount'.
 6.  Provide a confidence level (0-1) for your categorization.
 
 Receipt Text: {{{receiptText}}}
