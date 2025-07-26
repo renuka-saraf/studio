@@ -49,26 +49,28 @@ const prompt = ai.definePrompt({
   name: 'categorizeExpensePrompt',
   input: {schema: CategorizeExpenseInputSchema},
   output: {schema: CategorizeExpenseOutputSchema},
-  prompt: `You are an expert expense categorizer and data extractor with multi-lingual capabilities. Your primary task is to determine the total expense amount with perfect accuracy.
+  prompt: `You are an expert expense categorizer and data extractor with multi-lingual capabilities.
 
-You will be provided with the text and an image of a receipt. The receipt can be in any language. You MUST follow these steps:
+You will be provided with the text and an image of a receipt. The receipt can be in any language. Your task is to determine the total expense amount.
 
-1.  **Analyze Receipt Content**: First, examine the receipt to see if it contains a clear breakdown of individual items with quantities and prices.
-2.  **Determine Calculation Method**:
-    *   **IF** the receipt has detailed line items (item name, quantity, price): You MUST calculate the total yourself. Sum the result of (price * quantity) for every item, then add any taxes and subtract any discounts shown on the receipt. This calculated value is the **ONLY** value you should use for the 'amount' field. Do NOT use the total amount printed on the receipt if you can calculate it yourself from the items. Your own calculation takes precedence.
-    *   **ELSE IF** the receipt does NOT have a clear breakdown of line items: You MUST find and extract the final total amount printed on the receipt. Use this extracted value for the 'amount' field.
-3.  **Identify Currency**: Identify the currency from its symbol (e.g., ₹, $, €) or code (e.g., INR, USD, EUR) and determine its three-letter ISO 4217 code.
-4.  **Extract Items**: If available, extract each line item, its price, and quantity. If quantity is not mentioned, assume it is 1.
-5.  **Categorize**: Categorize the expense into 'grocery', 'dining', 'fashion', 'travel', or 'other'.
-    *   'grocery': raw food ingredients (e.g., 'peanuts', 'lentils', 'wheat', 'turmeric', 'tomato').
-    *   'dining': restaurants, cafes.
-    *   'travel': hotels, airline tickets.
-6.  **Confidence**: Provide a confidence level (0-1) for your categorization.
+You MUST follow this logic:
+1.  Analyze the receipt content.
+2.  **IF** the receipt contains a clear breakdown of individual items with quantities and prices:
+    *   You MUST calculate the total amount yourself. Sum the result of (price * quantity) for every single item.
+    *   Account for any taxes and subtract any discounts shown on the receipt.
+    *   This calculated value is the one you MUST use for the 'amount' field.
+3.  **ELSE IF** the receipt does NOT have a clear breakdown of line items:
+    *   You MUST find and extract the final total amount printed on the receipt.
+    *   Use this extracted value for the 'amount' field.
+4.  Identify the currency from its symbol or code and determine its three-letter ISO 4217 code.
+5.  If available, extract each line item, its price, and quantity. If quantity is not mentioned, assume it is 1.
+6.  Categorize the expense into 'grocery', 'dining', 'fashion', 'travel', or 'other'.
+7.  Provide a confidence level (0-1) for your categorization.
 
 Receipt Text: {{{receiptText}}}
 Receipt Image: {{media url=receiptDataUri}}
 
-Provide the output in the specified format. Your primary responsibility is to choose the correct method for determining the total amount based on the receipt's content and to perform the calculation accurately.`,
+Provide the output in the specified format. Your primary responsibility is to choose the correct method for determining the total amount based on the receipt's content.`,
 });
 
 const categorizeExpenseFlow = ai.defineFlow(
