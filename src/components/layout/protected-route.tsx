@@ -11,14 +11,15 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // If we have an email but no usage type, we are at the selection screen, no need to redirect from other pages yet, let them load.
-    // The main check is if usageType becomes null after being set.
+    // If there's no email or usageType, redirect to the start of the flow.
+    // This is the core logic that protects the route.
     if (!userEmail || !usageType) {
       router.push('/');
     }
   }, [usageType, userEmail, router]);
 
-  // Render a loading state while we check for authentication, to prevent flashes of content
+  // While checking, or if redirection is in progress, show a loading spinner.
+  // This prevents the protected content from flashing on the screen after logout.
   if (!usageType || !userEmail) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-200px)]">
@@ -27,5 +28,6 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // Only if the user is fully authenticated, render the page content.
   return <>{children}</>;
 }
