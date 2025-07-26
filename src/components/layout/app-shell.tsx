@@ -14,7 +14,6 @@ import {
   Split,
   Briefcase,
   FileText,
-  Percent,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -53,7 +52,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const businessMenuItems = [
     { href: '/inventory', label: 'Inventory', icon: Briefcase },
     { href: '/tax-report', label: 'Tax Report', icon: FileText },
-    { href: '/offers', label: 'Offers', icon: Percent },
   ];
 
   const menuItems = usageType === 'business' ? [...baseMenuItems, ...businessMenuItems] : baseMenuItems;
