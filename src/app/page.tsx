@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useReceipts } from '@/context/receipt-context';
-import { EmailAuth } from '@/components/scanalyze/email-auth';
+import { UsageModeSelector } from '@/components/scanalyze/usage-mode-selector';
 import { ReceiptUploader } from '@/components/scanalyze/receipt-uploader';
 import { ReceiptList } from '@/components/scanalyze/receipt-list';
 import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
@@ -38,11 +38,11 @@ if (getApps().length === 0) {
 
 
 export default function HomePage() {
-  const { isAuthenticated } = useReceipts();
+  const { usageMode } = useReceipts();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  if (!isAuthenticated) {
-    return <EmailAuth />;
+  if (!usageMode) {
+    return <UsageModeSelector />;
   }
 
   return (
