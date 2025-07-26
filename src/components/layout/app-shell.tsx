@@ -12,6 +12,7 @@ import {
   Ticket,
   LogOut,
   Menu,
+  Split,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -45,6 +46,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/inventory', label: 'Inventory', icon: Factory },
     { href: '/passes', label: 'Passes', icon: Ticket },
+    { href: '/split-expense', label: 'Split Expense', icon: Split },
   ];
 
   return (
