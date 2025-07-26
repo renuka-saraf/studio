@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, UserPlus, Users, Copy } from "lucide-react";
-import { Badge } from "../ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 interface SplitExpenseDialogProps {
@@ -58,7 +57,11 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
   const calculateSplit = () => {
     const validPeople = people.filter(p => p.trim() !== "");
     if (validPeople.length === 0) {
-      setSplitResult("Please add at least one person to split with.");
+      toast({
+        variant: "destructive",
+        title: "No one to split with!",
+        description: "Please add at least one person to split the expense.",
+      });
       return;
     }
     
@@ -97,13 +100,13 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto p-1">
             {/* Items List */}
             <div className="flex flex-col gap-4">
                 <h3 className="font-semibold text-lg">Items from Receipt</h3>
                 <ScrollArea className="flex-grow border rounded-md p-4">
                     <div className="space-y-2">
-                    {receipt.items.map((item, index) => (
+                    {receipt.items.length > 0 ? receipt.items.map((item, index) => (
                         <div key={index} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
                             <div className="flex items-center gap-2">
                                 <Checkbox
@@ -111,13 +114,15 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
                                     checked={selectedItems.some((i) => i.item === item.item && i.price === item.price)}
                                     onCheckedChange={() => handleItemToggle(item)}
                                 />
-                                <Label htmlFor={`item-${index}`} className="cursor-pointer">{item.item}</Label>
+                                <Label htmlFor={`item-${index}`} className="cursor-pointer truncate">{item.item}</Label>
                             </div>
-                            <span>
+                            <span className="flex-shrink-0 ml-2">
                                 {new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(item.price)}
                             </span>
                         </div>
-                    ))}
+                    )) : (
+                      <p className="text-sm text-muted-foreground text-center py-8">No individual items were extracted from this receipt.</p>
+                    )}
                     </div>
                 </ScrollArea>
             </div>
@@ -154,7 +159,7 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
                     {splitResult ? (
                         <div className="p-4 border border-dashed rounded-md space-y-2 relative">
                             <h4 className="font-semibold">Split Result</h4>
-                            <pre className="whitespace-pre-wrap text-sm bg-muted p-2 rounded-sm">{splitResult}</pre>
+                            <pre className="whitespace-pre-wrap text-sm bg-muted p-2 rounded-sm font-sans">{splitResult}</pre>
                              <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={copyToClipboard}>
                                 <Copy className="h-4 w-4" />
                             </Button>
