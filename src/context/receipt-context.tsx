@@ -73,7 +73,7 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   }
   
   const logout = () => {
-      setUserEmail(null);
+      // Keep userEmail, but clear usage type and data
       setUsageTypeState(null);
       setReceipts([]);
       setDashboardAnalysis(null);
