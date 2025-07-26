@@ -136,13 +136,14 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
     const finalSplits = { ...personSplits };
 
     // Assign remaining quantities to "You"
+    const youPerson = "You";
+    if(!finalSplits[youPerson]) {
+        finalSplits[youPerson] = {};
+    }
     receipt.items.forEach(item => {
         const remaining = remainingQuantities[item.item];
         if (remaining > 0) {
-            if (!finalSplits["You"]) {
-                finalSplits["You"] = {};
-            }
-            finalSplits["You"][item.item] = (finalSplits["You"][item.item] || 0) + remaining;
+            finalSplits[youPerson][item.item] = (finalSplits[youPerson][item.item] || 0) + remaining;
         }
     });
 
