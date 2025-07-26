@@ -129,33 +129,42 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
       toast({ variant: "destructive", title: "Add people to split with." });
       return;
     }
-    
-    const unassignedItems = Object.entries(remainingQuantities).filter(([,qty]) => qty > 0);
-    if(unassignedItems.length > 0){
-        toast({ variant: "destructive", title: "Unassigned Items", description: `${unassignedItems.map(([name, qty]) => `${qty}x ${name}`).join(', ')} still need to be assigned.` });
-        return;
-    }
 
     let resultLines = ["Expense Split Details:\n"];
     let grandTotal = 0;
 
+    const finalSplits = { ...personSplits };
+
+    // Assign remaining quantities to "You"
+    receipt.items.forEach(item => {
+        const remaining = remainingQuantities[item.item];
+        if (remaining > 0) {
+            if (!finalSplits["You"]) {
+                finalSplits["You"] = {};
+            }
+            finalSplits["You"][item.item] = (finalSplits["You"][item.item] || 0) + remaining;
+        }
+    });
+
     validPeople.forEach(person => {
         const personTotal = receipt.items.reduce((sum, item) => {
-            const qty = personSplits[person]?.[item.item] || 0;
+            const qty = finalSplits[person]?.[item.item] || 0;
             return sum + (item.price * qty);
         }, 0);
         
-        grandTotal += personTotal;
+        if (personTotal > 0) {
+            grandTotal += personTotal;
 
-        const formattedAmount = new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(personTotal);
-        resultLines.push(`- ${person}: ${formattedAmount}`);
-        
-        receipt.items.forEach(item => {
-            const qty = personSplits[person]?.[item.item] || 0;
-            if (qty > 0) {
-                resultLines.push(`    - ${qty}x ${item.item}`);
-            }
-        });
+            const formattedAmount = new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(personTotal);
+            resultLines.push(`- ${person}: ${formattedAmount}`);
+            
+            receipt.items.forEach(item => {
+                const qty = finalSplits[person]?.[item.item] || 0;
+                if (qty > 0) {
+                    resultLines.push(`    - ${qty}x ${item.item}`);
+                }
+            });
+        }
     });
 
     resultLines.push(`\nTotal: ${new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(grandTotal)}`);
@@ -175,7 +184,7 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
         <DialogHeader>
           <DialogTitle>Split Expense by Item</DialogTitle>
           <DialogDescription>
-            Assign items and quantities to each person to split the bill accurately.
+            Assign items and quantities to each person to split the bill accurately. Unassigned items default to you.
           </DialogDescription>
         </DialogHeader>
         
@@ -224,7 +233,7 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
                             </div>
                           </div>
                           <div className="space-y-2">
-                            {people.filter(p => p.trim() !== "").map((personName, personIndex) => (
+                            {people.filter(p => p.trim() !== "" && p !== "You").map((personName, personIndex) => (
                                 <div key={personIndex} className="flex justify-between items-center">
                                     <Label htmlFor={`${item.item}-${personName}`} className="text-sm text-muted-foreground truncate pr-2">{personName}</Label>
                                     <div className="flex items-center gap-2">
