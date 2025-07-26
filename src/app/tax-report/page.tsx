@@ -1,59 +1,51 @@
 
 "use client";
 
-import { useEffect, useState, useTransition } from 'react';
+import { useMemo } from 'react';
 import { useReceipts } from '@/context/receipt-context';
-import { generateTaxReport, TaxReportOutput } from '@/ai/flows/tax-calculator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { FileText, Loader2, RefreshCw, LandPlot } from 'lucide-react';
+import { FileText, LandPlot } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export default function TaxReportPage() {
   const { receipts } = useReceipts();
-  const [report, setReport] = useState<TaxReportOutput | null>(null);
-  const [isPending, startTransition] = useTransition();
 
-  const gstReceipts = receipts.filter(r => r.gstInfo && r.gstInfo.gstBreakdown && r.gstInfo.gstBreakdown.length > 0);
+  const gstData = useMemo(() => {
+    const gstReceipts = receipts.filter(r => r.gstInfo && r.gstInfo.gstBreakdown && r.gstInfo.gstBreakdown.length > 0);
+    
+    let totalGstPaid = 0;
+    const gstBreakdown: Record<string, number> = {};
 
-  const fetchReport = () => {
-    if (gstReceipts.length > 0) {
-      startTransition(async () => {
-        const reportInput = gstReceipts.map(r => ({
-          amount: r.amount,
-          gstInfo: r.gstInfo,
-          id: r.id,
-        }));
-        try {
-          // The type assertion is safe because we've already filtered for receipts with gstInfo.
-          const result = await generateTaxReport(reportInput as any);
-          setReport(result);
-        } catch (error) {
-          console.error("Failed to generate tax report:", error);
-          // Handle error
-        }
-      });
-    }
-  };
+    gstReceipts.forEach(receipt => {
+      if (receipt.gstInfo && receipt.gstInfo.gstBreakdown) {
+        receipt.gstInfo.gstBreakdown.forEach(item => {
+          totalGstPaid += item.amount;
+          gstBreakdown[item.taxType] = (gstBreakdown[item.taxType] || 0) + item.amount;
+        });
+      }
+    });
 
-  useEffect(() => {
-    fetchReport();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return {
+      gstReceipts,
+      totalGstPaid,
+      gstBreakdown,
+      hasGstData: gstReceipts.length > 0
+    };
   }, [receipts]);
   
   const getFormattedAmount = (amount: number) => {
       try {
+        const currency = receipts.find(r => r.currency)?.currency || "USD";
         return new Intl.NumberFormat("en-US", {
           style: "currency",
-          currency: receipts.find(r => r.currency)?.currency || "USD",
+          currency: currency,
         }).format(amount);
       } catch (e) {
         return `$${amount.toFixed(2)}`;
       }
   };
 
-  if (gstReceipts.length === 0 && !isPending) {
+  if (!gstData.hasGstData) {
     return (
        <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
         <LandPlot className="mx-auto h-12 w-12 text-gray-400" />
@@ -65,60 +57,44 @@ export default function TaxReportPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-            <FileText /> Tax Calculator
-          </h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            AI-generated summary of your GST payments for tax filing.
-          </p>
-        </div>
-        <Button onClick={fetchReport} disabled={isPending}>
-          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-          Generate Report
-        </Button>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
+          <FileText /> Tax Summary
+        </h1>
+        <p className="mt-2 text-lg text-muted-foreground">
+          A summary of total GST paid based on your scanned receipts.
+        </p>
       </div>
 
-      {isPending || !report ? (
-        <Card>
-            <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
-            <CardContent className="space-y-4">
-                <Skeleton className="h-6 w-1/3" />
-                <Skeleton className="h-20 w-full" />
-            </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Year-to-Date GST Summary</CardTitle>
-            <CardDescription>
-              Total GST Paid: <span className="font-bold text-primary">{getFormattedAmount(report.totalGstPaid)}</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="prose dark:prose-invert max-w-none">
-              <p>{report.summary}</p>
-            </div>
-            
-            {report.gstBreakdown && Object.keys(report.gstBreakdown).length > 0 && (
-              <>
-                <Separator />
-                <h3 className="font-semibold text-lg">Tax Breakdown</h3>
-                <div className="space-y-2 rounded-md border p-4">
-                  {Object.entries(report.gstBreakdown).map(([key, value]) => (
-                    <div key={key} className="flex justify-between items-center">
-                      <span className="text-muted-foreground uppercase">{key}</span>
-                      <span className="font-medium">{getFormattedAmount(value)}</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Aggregated GST Payments</CardTitle>
+          <CardDescription>
+            Total GST Paid: <span className="font-bold text-primary">{getFormattedAmount(gstData.totalGstPaid)}</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            This report summarizes the Goods and Services Tax (GST) found on your receipts. This can be helpful for tracking business expenses and for reference during tax filing. Always consult a professional tax advisor for official filings.
+          </p>
+          
+          {Object.keys(gstData.gstBreakdown).length > 0 && (
+            <>
+              <Separator />
+              <h3 className="font-semibold text-lg">Tax Breakdown</h3>
+              <div className="space-y-2 rounded-md border p-4">
+                {Object.entries(gstData.gstBreakdown).map(([key, value]) => (
+                  <div key={key} className="flex justify-between items-center">
+                    <span className="text-muted-foreground uppercase">{key}</span>
+                    <span className="font-medium">{getFormattedAmount(value)}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
-          </CardContent>
-        </Card>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
