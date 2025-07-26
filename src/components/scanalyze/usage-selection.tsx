@@ -3,11 +3,12 @@
 
 import { useReceipts } from '@/context/receipt-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, User } from 'lucide-react';
+import { Building, User, LogOut } from 'lucide-react';
 import { ScanalyzeLogo } from '../icons/logo';
+import { Button } from '../ui/button';
 
 export function UsageSelection() {
-  const { userEmail, setUsageType } = useReceipts();
+  const { userEmail, setUsageType, logout } = useReceipts();
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -43,6 +44,12 @@ export function UsageSelection() {
               <CardDescription className="mt-2">Manage business expenses, track reimbursements, and categorize for accounting.</CardDescription>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mt-8">
+            <Button variant="link" onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" /> Go back
+            </Button>
         </div>
       </div>
     </div>
