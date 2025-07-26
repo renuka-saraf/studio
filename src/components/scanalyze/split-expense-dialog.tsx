@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, UserPlus, Users, Copy, Minus, Plus } from "lucide-react";
+import { X, UserPlus, Users, Copy, Minus, Plus, Wallet } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "../ui/badge";
+import { Card, CardContent } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 interface SplitExpenseDialogProps {
   isOpen: boolean;
@@ -24,10 +26,15 @@ type PersonSplits = {
   };
 };
 
+type SplitResult = {
+  person: string;
+  amount: number;
+}
+
 export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDialogProps) {
   const [people, setPeople] = useState<string[]>(["You", ""]);
   const [personSplits, setPersonSplits] = useState<PersonSplits>({});
-  const [splitResult, setSplitResult] = useState<string | null>(null);
+  const [splitResult, setSplitResult] = useState<SplitResult[] | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -130,14 +137,9 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
       return;
     }
 
-    let resultLines = ["Expense Split Details:\n"];
-    let grandTotal = 0;
-
     const finalSplits = { ...personSplits };
-
-    // Assign remaining quantities to "You"
     const youPerson = "You";
-    if(!finalSplits[youPerson]) {
+    if (!finalSplits[youPerson]) {
         finalSplits[youPerson] = {};
     }
     receipt.items.forEach(item => {
@@ -147,6 +149,8 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
         }
     });
 
+    const results: SplitResult[] = [];
+
     validPeople.forEach(person => {
         const personTotal = receipt.items.reduce((sum, item) => {
             const qty = finalSplits[person]?.[item.item] || 0;
@@ -154,29 +158,29 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
         }, 0);
         
         if (personTotal > 0) {
-            grandTotal += personTotal;
-
-            const formattedAmount = new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(personTotal);
-            resultLines.push(`- ${person}: ${formattedAmount}`);
-            
-            receipt.items.forEach(item => {
-                const qty = finalSplits[person]?.[item.item] || 0;
-                if (qty > 0) {
-                    resultLines.push(`    - ${qty}x ${item.item}`);
-                }
-            });
+            results.push({ person, amount: personTotal });
         }
     });
 
-    resultLines.push(`\nTotal: ${new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(grandTotal)}`);
-    setSplitResult(resultLines.join('\n'));
+    setSplitResult(results);
   };
 
   const copyToClipboard = () => {
     if (splitResult) {
-      navigator.clipboard.writeText(splitResult);
+      const summary = splitResult.map(res =>
+        `${res.person} owes ${new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency }).format(res.amount)}`
+      ).join('\n');
+      navigator.clipboard.writeText(summary);
       toast({ title: "Copied to clipboard!" });
     }
+  }
+
+  const formatCurrency = (amount: number) => {
+     try {
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: receipt.currency || "USD" }).format(amount);
+     } catch (e) {
+        return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", currencyDisplay: 'code' }).format(amount).replace("USD", receipt.currency || "");
+     }
   }
 
   return (
@@ -264,28 +268,40 @@ export function SplitExpenseDialog({ isOpen, onClose, receipt }: SplitExpenseDia
               {/* Calculation & Result */}
               <div className="flex flex-col gap-4">
                   <h3 className="font-semibold text-lg">Result</h3>
-                  <div className="flex-grow p-4 border rounded-md relative flex flex-col">
+                  <Card className="flex-grow relative flex flex-col">
                       {splitResult ? (
-                          <>
-                           <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={copyToClipboard}>
-                                <Copy className="h-4 w-4" />
-                            </Button>
-                           <ScrollArea className="flex-grow">
-                                <pre className="whitespace-pre-wrap text-sm font-sans">{splitResult}</pre>
-                           </ScrollArea>
-                          </>
+                        <>
+                          <Button variant="ghost" size="icon" className="absolute top-2 right-2 z-10" onClick={copyToClipboard}>
+                              <Copy className="h-4 w-4" />
+                          </Button>
+                          <CardContent className="p-0 flex-grow">
+                            <ScrollArea className="h-full">
+                                <div className="p-4 space-y-3">
+                                {splitResult.map((res, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 rounded-md bg-secondary">
+                                      <p className="font-medium">{res.person}</p>
+                                      <p className="font-semibold text-lg">{formatCurrency(res.amount)}</p>
+                                    </div>
+                                ))}
+                                </div>
+                            </ScrollArea>
+                          </CardContent>
+                        </>
                       ) : (
-                          <div className="m-auto text-center text-muted-foreground">
-                              <p>Assign items and click "Calculate Split" to see the results.</p>
-                          </div>
+                        <div className="m-auto text-center text-muted-foreground p-4">
+                            <Wallet className="mx-auto h-10 w-10 mb-2"/>
+                            <p>Assign items and click "Calculate Split" to see the results.</p>
+                        </div>
                       )}
-                  </div>
-                  <Button className="w-full" onClick={calculateSplit} disabled={splitResult !== null}>
-                      Calculate Split
-                  </Button>
-                  {splitResult && (
+                  </Card>
+
+                  {splitResult ? (
                     <Button className="w-full" variant="secondary" onClick={() => setSplitResult(null)}>
                         Edit Split
+                    </Button>
+                  ) : (
+                    <Button className="w-full" onClick={calculateSplit}>
+                        Calculate Split
                     </Button>
                   )}
               </div>
