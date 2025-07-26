@@ -31,8 +31,8 @@ const ExpenseItemSchema = z.object({
 });
 
 const GstInfoSchema = z.object({
-    gstNumber: z.string().optional().describe('The GST Identification Number found on the receipt.'),
-    gstAmount: z.number().optional().describe('The total GST amount paid.'),
+    gstNumber: z.string().optional().describe('The GST Identification Number (GSTIN) found on the receipt.'),
+    gstBreakdown: z.record(z.number()).optional().describe("A breakdown of all GST components and their amounts, like {'CGST': 25.50, 'SGST': 25.50}. Extract all tax types mentioned."),
 });
 
 const CategorizeExpenseOutputSchema = z.object({
@@ -78,7 +78,7 @@ Extraction and Categorization Logic:
 4.  Based on the 'usageType', categorize the expense.
     *   If 'personal': use categories like 'grocery', 'dining', 'fashion', 'travel', or 'other'.
     *   If 'business': use categories like 'utilities', 'inventory purchasing', 'stationery', 'maintenance', or 'other'.
-5.  **If 'business' usage and GST information (GSTIN, GST amount) is present, you MUST extract it.**
+5.  **If 'business' usage and GST information is present, you MUST extract it.** This includes the GSTIN and a full breakdown of all GST components (CGST, SGST, IGST, etc.) into the 'gstBreakdown' field.
 6.  Provide a confidence level (0-1) for your categorization.
 
 Receipt Text: {{{receiptText}}}

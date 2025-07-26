@@ -10,28 +10,13 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { GstInfo, Receipt } from '@/context/receipt-context';
 
-const GstInfoSchema = z.object({
-  gstNumber: z.string().describe('The GST Identification Number.'),
-  gstAmount: z.number().describe('The total GST amount paid on the receipt.'),
-});
 
-export const TaxReportInputSchema = z.object({
-  receipts: z
-    .array(
-      z.object({
-        totalAmount: z.number(),
-        gstInfo: GstInfoSchema,
-        date: z.string().describe('The date of the purchase in ISO format.'),
-      })
-    )
-    .describe(
-      'An array of receipts containing GST information.'
-    ),
-});
-export type TaxReportInput = z.infer<typeof TaxReportInputSchema>;
+// Define input/output types for the function, but DO NOT export the Zod schemas.
+export type TaxReportInput = Pick<Receipt, 'totalAmount' | 'gstInfo' | 'id'>[];
 
-export const TaxReportOutputSchema = z.object({
+const TaxReportOutputSchema = z.object({
   summary: z
     .string()
     .describe(
@@ -40,12 +25,27 @@ export const TaxReportOutputSchema = z.object({
   totalGstPaid: z
     .number()
     .describe('The aggregated total of all GST paid across all receipts.'),
+  gstBreakdown: z.record(z.number()).describe('A breakdown of total amounts for each type of GST found (e.g., CGST, SGST, IGST).')
 });
 export type TaxReportOutput = z.infer<typeof TaxReportOutputSchema>;
 
-export async function generateTaxReport(input: TaxReportInput): Promise<TaxReportOutput> {
-  return taxReportFlow(input);
+// This is the only exported function.
+export async function generateTaxReport(receipts: TaxReportInput): Promise<TaxReportOutput> {
+  return taxReportFlow(receipts);
 }
+
+// Internal Zod schema for the prompt, not exported.
+const TaxReportInputSchema = z.array(
+    z.object({
+      totalAmount: z.number(),
+      gstInfo: z.object({
+        gstNumber: z.string().optional(),
+        gstBreakdown: z.record(z.number()).optional().describe("A breakdown of different GST types and their amounts, e.g., {'CGST': 5, 'SGST': 5}"),
+      }),
+      id: z.string().describe('The date of the purchase as a stringified timestamp.'),
+    })
+  ).describe('An array of receipts containing GST information.');
+
 
 const prompt = ai.definePrompt({
   name: 'taxReportPrompt',
@@ -53,20 +53,21 @@ const prompt = ai.definePrompt({
   output: {schema: TaxReportOutputSchema},
   prompt: `You are a helpful accounting AI assistant. Your purpose is to analyze a list of receipts and generate a summary to assist a small business owner with their tax return filing, specifically focusing on Goods and Services Tax (GST).
 
-First, calculate the 'totalGstPaid' by summing up the 'gstAmount' from every single receipt provided in the input.
+First, calculate the 'totalGstPaid' by summing up the value of every single GST type from every receipt.
+Then, create a 'gstBreakdown' by summing up the totals for each individual GST type (like CGST, SGST, IGST) across all receipts.
 
 Then, analyze the aggregated data and provide a concise, user-friendly 'summary'. This summary should:
-- State the total GST paid.
+- State the total GST paid and mention the breakdown.
 - Explain what this figure represents (e.g., potential for input tax credit).
 - Advise the user to consult with a professional tax advisor for official filing.
 - Do NOT provide definitive financial or legal advice.
 
 Here is the list of receipts:
-{{#each receipts}}
-- Date: {{this.date}}, Total: {{this.totalAmount}}, GSTIN: {{this.gstInfo.gstNumber}}, GST Paid: {{this.gstInfo.gstAmount}}
+{{#each this}}
+- Date: {{this.id}}, Total: {{this.totalAmount}}, GSTIN: {{this.gstInfo.gstNumber}}, GST Breakdown: {{#each this.gstInfo.gstBreakdown}}{{@key}}: {{this}} {{/each}}
 {{/each}}
 
-Generate the 'totalGstPaid' and the 'summary' and provide the output in the specified JSON format.`,
+Generate the 'totalGstPaid', 'gstBreakdown' and the 'summary' and provide the output in the specified JSON format.`,
 });
 
 const taxReportFlow = ai.defineFlow(
@@ -75,17 +76,25 @@ const taxReportFlow = ai.defineFlow(
     inputSchema: TaxReportInputSchema,
     outputSchema: TaxReportOutputSchema,
   },
-  async input => {
-    // The prompt can calculate the sum, but doing it here is more reliable.
-    const totalGstPaid = input.receipts.reduce(
-      (sum, receipt) => sum + (receipt.gstInfo.gstAmount || 0),
-      0
-    );
+  async (receipts) => {
+    // The prompt can calculate the sums, but doing it here is more reliable.
+    let totalGstPaid = 0;
+    const gstBreakdown: Record<string, number> = {};
 
-    const {output} = await prompt(input);
+    receipts.forEach(receipt => {
+        if (receipt.gstInfo && receipt.gstInfo.gstBreakdown) {
+            for (const [key, value] of Object.entries(receipt.gstInfo.gstBreakdown)) {
+                totalGstPaid += value;
+                gstBreakdown[key] = (gstBreakdown[key] || 0) + value;
+            }
+        }
+    });
+
+    const {output} = await prompt(receipts);
     
-    // Ensure the calculated total is set on the final output.
+    // Ensure the calculated totals are set on the final output.
     output!.totalGstPaid = totalGstPaid;
+    output!.gstBreakdown = gstBreakdown;
     
     return output!;
   }

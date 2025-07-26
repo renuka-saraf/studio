@@ -3,32 +3,31 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useReceipts } from '@/context/receipt-context';
-import { generateTaxReport, TaxReportInput } from '@/ai/flows/tax-calculator';
+import { generateTaxReport, TaxReportOutput } from '@/ai/flows/tax-calculator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FileText, Loader2, RefreshCw, LandPlot } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 export default function TaxReportPage() {
   const { receipts } = useReceipts();
-  const [report, setReport] = useState<{ summary: string; totalGstPaid: number } | null>(null);
+  const [report, setReport] = useState<TaxReportOutput | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const gstReceipts = receipts.filter(r => r.gstInfo && r.gstInfo.gstAmount);
+  const gstReceipts = receipts.filter(r => r.gstInfo && r.gstInfo.gstBreakdown && Object.keys(r.gstInfo.gstBreakdown).length > 0);
 
   const fetchReport = () => {
     if (gstReceipts.length > 0) {
       startTransition(async () => {
-        const reportInput: TaxReportInput = {
-          receipts: gstReceipts.map(r => ({
-            totalAmount: r.amount,
-            gstInfo: {
-              gstNumber: r.gstInfo?.gstNumber || 'N/A',
-              gstAmount: r.gstInfo?.gstAmount || 0,
-            },
-            date: new Date(parseInt(r.id)).toISOString(),
-          }))
-        };
+        const reportInput = gstReceipts.map(r => ({
+          totalAmount: r.amount,
+          gstInfo: {
+            gstNumber: r.gstInfo?.gstNumber,
+            gstBreakdown: r.gstInfo?.gstBreakdown || {},
+          },
+          id: r.id,
+        }));
         try {
           const result = await generateTaxReport(reportInput);
           setReport(result);
@@ -42,6 +41,7 @@ export default function TaxReportPage() {
 
   useEffect(() => {
     fetchReport();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receipts]);
   
   const getFormattedAmount = (amount: number) => {
@@ -54,7 +54,6 @@ export default function TaxReportPage() {
         return `$${amount.toFixed(2)}`;
       }
   };
-
 
   if (gstReceipts.length === 0 && !isPending) {
     return (
@@ -99,10 +98,26 @@ export default function TaxReportPage() {
               Total GST Paid: <span className="font-bold text-primary">{getFormattedAmount(report.totalGstPaid)}</span>
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div className="prose dark:prose-invert max-w-none">
               <p>{report.summary}</p>
             </div>
+            
+            {report.gstBreakdown && Object.keys(report.gstBreakdown).length > 0 && (
+              <>
+                <Separator />
+                <h3 className="font-semibold text-lg">Tax Breakdown</h3>
+                <div className="space-y-2 rounded-md border p-4">
+                  {Object.entries(report.gstBreakdown).map(([key, value]) => (
+                    <div key={key} className="flex justify-between items-center">
+                      <span className="text-muted-foreground uppercase">{key}</span>
+                      <span className="font-medium">{getFormattedAmount(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
           </CardContent>
         </Card>
       )}

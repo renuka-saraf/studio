@@ -7,7 +7,7 @@ import { Timestamp } from 'firebase/firestore';
 
 export interface GstInfo {
     gstNumber?: string;
-    gstAmount?: number;
+    gstBreakdown?: Record<string, number>;
 }
 
 export interface ExpenseItem {
