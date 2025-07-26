@@ -7,20 +7,22 @@ import { ReceiptUploader } from '@/components/scanalyze/receipt-uploader';
 import { ReceiptList } from '@/components/scanalyze/receipt-list';
 import { EmailAuth } from '@/components/scanalyze/email-auth';
 import { UsageSelection } from '@/components/scanalyze/usage-selection';
-import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
-import { initializeApp, getApps } from 'firebase/app';
+// import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
+// import { getFirestore } from 'firebase/firestore';
+// import { initializeApp, getApps } from 'firebase/app';
 
 
-// Your web app's Firebase configuration (paste the one you copied)
+// TODO: PASTE YOUR FIREBASE CONFIGURATION HERE
+// To enable Firebase, uncomment the imports above and the code below.
+// Then, replace this placeholder with your project's actual Firebase configuration.
+/*
 const firebaseConfig = {
-  apiKey: "AIzaSyC...",
-  authDomain: "scanalyze-8x740.firebaseapp.com",
-  projectId: "scanalyze-8x740",
-  storageBucket: "scanalyze-8x740.appspot.com",
-  messagingSenderId: "213425288049",
-  appId: "1:213425288049:web:a1b2c3d4e5f6g7h8i9j0",
-  // measurementId: "G-XXXXXXXXXX"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase
@@ -36,6 +38,7 @@ if (getApps().length === 0) {
       }
   }
 }
+*/
 
 
 export default function HomePage() {

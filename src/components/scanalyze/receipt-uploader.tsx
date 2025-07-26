@@ -14,8 +14,8 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
+// import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
+// import { getFirestore } from 'firebase/firestore';
 
 
 interface ReceiptUploaderProps {
@@ -71,33 +71,33 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         gstInfo: result.gstInfo,
       };
       
-      const db = getFirestore();
+      // const db = getFirestore();
 
-      const receiptDataForFirestore = {
-        userEmail: userEmail,
-        timestamp: new Date(),
-        items: result.items || [],
-        category: result.category,
-        confidence: result.confidence || 0,
-        totalAmount: result.amount || 0,
-        currency: result.currency,
-        gstInfo: result.gstInfo,
-        rawData: receiptText, 
-        imageDataUri: dataUri,
-      };
+      // const receiptDataForFirestore = {
+      //   userEmail: userEmail,
+      //   timestamp: new Date(),
+      //   items: result.items || [],
+      //   category: result.category,
+      //   confidence: result.confidence || 0,
+      //   totalAmount: result.amount || 0,
+      //   currency: result.currency,
+      //   gstInfo: result.gstInfo,
+      //   rawData: receiptText, 
+      //   imageDataUri: dataUri,
+      // };
 
       try {
-        const docRef = await addDoc(collection(db, `users/${userEmail}/receipts`), receiptDataForFirestore);
-        console.log('Receipt document written with ID: ', docRef.id);
+        // const docRef = await addDoc(collection(db, `users/${userEmail}/receipts`), receiptDataForFirestore);
+        // console.log('Receipt document written with ID: ', docRef.id);
 
-        const spendingSummaryRef = doc(db, `users/${userEmail}/spendingSummary`, result.category);
-        await setDoc(spendingSummaryRef, {
-          userEmail: userEmail,
-          category: result.category,
-          totalSpent: increment(result.amount || 0),
-          lastUpdated: new Date(),
-        }, { merge: true }); 
-        console.log('Spending summary updated for category: ', result.category);
+        // const spendingSummaryRef = doc(db, `users/${userEmail}/spendingSummary`, result.category);
+        // await setDoc(spendingSummaryRef, {
+        //   userEmail: userEmail,
+        //   category: result.category,
+        //   totalSpent: increment(result.amount || 0),
+        //   lastUpdated: new Date(),
+        // }, { merge: true }); 
+        // console.log('Spending summary updated for category: ', result.category);
 
         addReceipt(newReceiptForState);
 
