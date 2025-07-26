@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that provides an option to reorder groceries from a receipt via a third-party quick commerce application.
@@ -43,16 +44,17 @@ const quickCommerceReorderPrompt = ai.definePrompt({
   prompt: `You are a helpful AI assistant designed to analyze grocery receipts and provide users with a convenient way to reorder their items through a third-party quick commerce application.
 
   Analyze the following receipt text:
-  {{receiptText}}
+  {{{receiptText}}}
 
   Determine if a reorder link can be generated based on the items listed in the receipt.
 
   If a reorder link can be generated:
-  - Create a URL that deep links to the quick commerce application with the items from the receipt added to the cart. If you are unable to construct a valid url, do not return one.
+  - Create a URL that deep links to the quick commerce application with the items from the receipt added to the cart. For this prototype, you can use a placeholder URL like "https://example.com/cart?items=...". If you are unable to construct a valid url, do not return one.
+  - Set the message to "Your items are ready for reorder!"
 
-  If a reorder link cannot be generated:
+  If a reorder link cannot be generated (e.g., items are unclear):
   - Explain to the user that a reorder link is not available and state the reason.
-  - Try to extract the list of items from the receipt and show it to the user.
+  - Try to extract the list of items from the receipt and show it to the user in the message.
 
   Ensure that the response is clear, concise, and user-friendly.
   `,
