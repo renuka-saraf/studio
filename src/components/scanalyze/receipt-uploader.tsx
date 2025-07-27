@@ -1,9 +1,8 @@
-
 "use client";
 
 import { useState, useRef, type Dispatch, type SetStateAction, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Camera, Loader2, Video, Ban } from 'lucide-react';
+import { Upload, Camera, Loader2, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useReceipts, type Receipt } from '@/context/receipt-context';
@@ -14,9 +13,6 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-// import { collection, addDoc, doc, setDoc, increment } from 'firebase/firestore';
-// import { getFirestore } from 'firebase/firestore';
-
 
 interface ReceiptUploaderProps {
   isProcessing: boolean;
@@ -71,50 +67,12 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         gstInfo: result.gstInfo,
       };
       
-      // const db = getFirestore();
+      addReceipt(newReceiptForState);
 
-      // const receiptDataForFirestore = {
-      //   userEmail: userEmail,
-      //   timestamp: new Date(),
-      //   items: result.items || [],
-      //   category: result.category,
-      //   confidence: result.confidence || 0,
-      //   totalAmount: result.amount || 0,
-      //   currency: result.currency,
-      //   gstInfo: result.gstInfo,
-      //   rawData: receiptText, 
-      //   imageDataUri: dataUri,
-      // };
-
-      try {
-        // const docRef = await addDoc(collection(db, `users/${userEmail}/receipts`), receiptDataForFirestore);
-        // console.log('Receipt document written with ID: ', docRef.id);
-
-        // const spendingSummaryRef = doc(db, `users/${userEmail}/spendingSummary`, result.category);
-        // await setDoc(spendingSummaryRef, {
-        //   userEmail: userEmail,
-        //   category: result.category,
-        //   totalSpent: increment(result.amount || 0),
-        //   lastUpdated: new Date(),
-        // }, { merge: true }); 
-        // console.log('Spending summary updated for category: ', result.category);
-
-        addReceipt(newReceiptForState);
-
-        toast({
-          title: "Receipt Categorized!",
-          description: `Expense added to '${result.category}' with ${Math.round((result.confidence || 0) * 100)}% confidence.`,
-        });
-
-      } catch (error) {
-        console.error("Error saving data to Firebase:", error);
-        addReceipt(newReceiptForState); // Still add to local state on DB error
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong saving your data.",
-          description: "Failed to save receipt data to the database. It is saved locally.",
-        });
-      }
+      toast({
+        title: "Receipt Categorized!",
+        description: `Expense added to '${result.category}' with ${Math.round((result.confidence || 0) * 100)}% confidence.`,
+      });
       
     } catch (error) {
       console.error("Categorization failed:", error);
@@ -200,13 +158,13 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
 
   return (
     <>
-      <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card">
         <CardContent className="p-0">
           <div
             {...getRootProps()}
             className={cn(
               "relative flex flex-col items-center justify-center p-8 border-2 border-dashed cursor-pointer transition-colors h-64",
-              isDragActive ? "border-primary bg-primary/10" : "border-gray-300 dark:border-gray-700 hover:border-primary/50"
+              isDragActive ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
             )}
           >
             <input {...getInputProps()} ref={fileInputRef} />
@@ -214,23 +172,23 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
               <div className="relative w-full h-full">
                   <Image src={preview} alt="Receipt preview" fill className="rounded-lg object-contain" />
                   {showScanner && <div className="absolute top-0 left-0 w-full h-full scanner-animation rounded-lg" />}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-lg">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 rounded-lg">
                       <Loader2 className="h-12 w-12 animate-spin text-white" />
                       <p className="text-white mt-4 text-lg font-medium">Scanning & Analyzing...</p>
                   </div>
               </div>
             ) : (
-              <div className="text-center">
-                <Upload className="mx-auto h-12 w-12 text-gray-400" />
+              <div className="text-center text-muted-foreground">
+                <Upload className="mx-auto h-12 w-12" />
                 <p className="mt-4 text-lg font-medium">
-                  {isDragActive ? "Drop the files here ..." : "Drag & drop a receipt image"}
+                  {isDragActive ? "Drop the files here ..." : "Drag & drop a receipt"}
                 </p>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">or use the buttons below</p>
+                <p className="mt-1 text-sm">or use the buttons below</p>
               </div>
             )}
           </div>
         </CardContent>
-        <CardFooter className="bg-gray-50 dark:bg-gray-800 p-4 flex justify-center gap-4">
+        <CardFooter className="bg-secondary/50 p-4 flex justify-center gap-4">
           <Button onClick={() => fileInputRef.current?.click()} disabled={isProcessing} size="lg">
             <Upload className="mr-2 h-5 w-5" />
             Upload File

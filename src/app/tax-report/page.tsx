@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -48,10 +47,10 @@ function TaxReportPageContent() {
 
   if (!gstData.hasGstData) {
     return (
-       <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-        <LandPlot className="mx-auto h-12 w-12 text-gray-400" />
+       <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg border-border">
+        <LandPlot className="mx-auto h-12 w-12 text-muted-foreground" />
         <h3 className="mt-2 text-sm font-semibold">No GST Data Found</h3>
-        <p className="mt-1 text-sm text-gray-500">Scan receipts with GST information to generate a tax report.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Scan receipts with GST info to generate a tax report.</p>
       </div>
     );
   }
@@ -63,11 +62,11 @@ function TaxReportPageContent() {
           <FileText /> Tax Summary
         </h1>
         <p className="mt-2 text-lg text-muted-foreground">
-          A summary of total GST paid based on your scanned receipts.
+          A summary of GST paid based on your scanned receipts.
         </p>
       </div>
 
-      <Card>
+      <Card className="bg-card">
         <CardHeader>
           <CardTitle>Aggregated GST Payments</CardTitle>
           <CardDescription>
@@ -76,14 +75,14 @@ function TaxReportPageContent() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            This report summarizes the Goods and Services Tax (GST) found on your receipts. This can be helpful for tracking business expenses and for reference during tax filing. Always consult a professional tax advisor for official filings.
+            This report summarizes the Goods and Services Tax (GST) from your receipts. This can be helpful for tracking business expenses. Always consult a tax professional for official filings.
           </p>
           
           {Object.keys(gstData.gstBreakdown).length > 0 && (
             <>
               <Separator />
               <h3 className="font-semibold text-lg">Tax Breakdown</h3>
-              <div className="space-y-2 rounded-md border p-4">
+              <div className="space-y-2 rounded-md border p-4 border-border">
                 {Object.entries(gstData.gstBreakdown).map(([key, value]) => (
                   <div key={key} className="flex justify-between items-center">
                     <span className="text-muted-foreground uppercase">{key}</span>

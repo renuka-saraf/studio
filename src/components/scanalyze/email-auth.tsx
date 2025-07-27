@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -30,12 +29,12 @@ export function EmailAuth() {
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm bg-card">
         <CardHeader className="text-center items-center space-y-4">
-          <ScanalyzeLogo className="h-16 w-auto" />
-          <CardTitle>Welcome Back!</CardTitle>
+          <ScanalyzeLogo className="h-20 w-auto" />
+          <CardTitle>Welcome to Scanalyze</CardTitle>
           <CardDescription>
-            Enter your email to access your dashboard.
+            Enter your email to continue
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -52,12 +51,12 @@ export function EmailAuth() {
             />
           </div>
           <Button onClick={handleLogin} className="w-full">
-            Continue with Email
+            Continue
           </Button>
         </CardContent>
         <CardFooter>
           <p className="text-xs text-muted-foreground text-center w-full">
-            We'll use your email to securely store your receipt data.
+            Your data is stored securely.
           </p>
         </CardFooter>
       </Card>

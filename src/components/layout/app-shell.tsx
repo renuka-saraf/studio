@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from 'react';
@@ -7,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   Home,
   LayoutDashboard,
-  ScanLine,
   Ticket,
   LogOut,
   Menu,
@@ -36,6 +34,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useReceipts } from '@/context/receipt-context';
 import { ScanalyzeLogo } from '../icons/logo';
+import { ModeToggle } from './mode-toggle';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -43,10 +42,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = React.useState(true);
 
   const baseMenuItems = [
-    { href: '/', label: 'Scan Receipt', icon: Home },
+    { href: '/', label: 'Scan', icon: Home },
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/passes', label: 'Passes', icon: Ticket },
-    { href: '/split-expense', label: 'Split Expense', icon: Split },
+    { href: '/split-expense', label: 'Split', icon: Split },
   ];
 
   const businessMenuItems = [
@@ -69,11 +68,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-2 flex-1">
                         <Button variant="ghost" size="icon" asChild>
                             <Link href="/">
-                                <ScanalyzeLogo className="h-6 w-6" />
+                                <ScanalyzeLogo className="h-8 w-8" />
                                 <span className="sr-only">Scanalyze</span>
                             </Link>
                         </Button>
-                        <h1 className="text-lg font-semibold tracking-tight font-headline">Scanalyze</h1>
+                        <h1 className="text-xl font-semibold tracking-tight font-headline">Scanalyze</h1>
                     </div>
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="icon">
@@ -84,7 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
               </SidebarHeader>
               <CollapsibleContent>
-                <SidebarMenu className="mt-2">
+                <SidebarMenu className="mt-4">
                   {menuItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <SidebarMenuButton
@@ -107,25 +106,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon" asChild>
                         <Link href="/">
-                            <ScanalyzeLogo className="h-6 w-6" />
+                            <ScanalyzeLogo className="h-8 w-8" />
                             <span className="sr-only">Scanalyze</span>
                         </Link>
                     </Button>
-                    <h1 className="text-lg font-semibold tracking-tight font-headline">Scanalyze</h1>
+                    <h1 className="text-xl font-semibold tracking-tight font-headline">Scanalyze</h1>
                 </div>
             </SidebarHeader>
           )}
         </SidebarContent>
         {isFullyAuthenticated && (
             <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton onClick={logout} tooltip={{children: "Logout", className: "font-body"}}>
-                            <LogOut />
-                            <span className="font-body">Logout</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <div className="flex items-center gap-2">
+                    <ModeToggle />
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton onClick={logout} tooltip={{children: "Logout", className: "font-body"}}>
+                                <LogOut />
+                                <span className="font-body">Logout</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </div>
             </SidebarFooter>
         )}
       </Sidebar>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -43,14 +42,14 @@ function SplitExpensePageContent() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight font-headline">Split an Expense</h1>
         <p className="mt-2 text-lg text-muted-foreground">
-          Select a receipt to split the bill with others.
+          Select a receipt to split the bill.
         </p>
       </div>
 
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-md mx-auto bg-card">
         <CardHeader>
-          <CardTitle>Select a Receipt</CardTitle>
-          <CardDescription>Choose one of your scanned receipts from the list below.</CardDescription>
+          <CardTitle>Select Receipt</CardTitle>
+          <CardDescription>Choose a scanned receipt from the list.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Select onValueChange={setSelectedReceiptId} disabled={isLoading || receipts.length === 0}>
@@ -76,10 +75,10 @@ function SplitExpensePageContent() {
       </Card>
 
       {receipts.length === 0 && !isLoading && (
-        <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-          <FileText className="mx-auto h-12 w-12 text-gray-400" />
+        <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg border-border">
+          <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-2 text-sm font-semibold">No Receipts to Split</h3>
-          <p className="mt-1 text-sm text-gray-500">Scan a receipt on the main page to get started.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Scan a receipt to get started.</p>
         </div>
       )}
 

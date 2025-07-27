@@ -3,6 +3,7 @@ import './globals.css';
 import { AppShell } from '@/components/layout/app-shell';
 import { Toaster } from '@/components/ui/toaster';
 import { ReceiptProvider } from '@/context/receipt-context';
+import { ThemeProvider } from '@/components/layout/theme-provider';
 
 export const metadata: Metadata = {
   title: 'Scanalyze',
@@ -29,10 +30,17 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <ReceiptProvider>
-          <AppShell>{children}</AppShell>
-          <Toaster />
-        </ReceiptProvider>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <ReceiptProvider>
+                <AppShell>{children}</AppShell>
+                <Toaster />
+            </ReceiptProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,10 +1,8 @@
-
 "use client";
 
 import { useEffect, useState, useTransition } from 'react';
 import { useReceipts, Receipt } from '@/context/receipt-context';
 import { getInventoryStockRecommendations } from '@/ai/flows/inventory-stock-recommendations';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -49,10 +47,10 @@ function InventoryPageContent() {
 
   if (inventoryReceipts.length === 0 && !isPending) {
     return (
-      <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-        <FileQuestion className="mx-auto h-12 w-12 text-gray-400" />
+      <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg border-border">
+        <FileQuestion className="mx-auto h-12 w-12 text-muted-foreground" />
         <h3 className="mt-2 text-sm font-semibold">No Inventory Data</h3>
-        <p className="mt-1 text-sm text-gray-500">Scan receipts categorized as 'inventory purchasing' to get recommendations.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Scan 'inventory purchasing' receipts to get recommendations.</p>
       </div>
     );
   }
@@ -62,10 +60,10 @@ function InventoryPageContent() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-headline flex items-center gap-2">
-            <Briefcase /> Inventory Analysis
+            <Briefcase /> Inventory
           </h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            AI-powered restocking and trend analysis for your business.
+            AI-powered restocking and trend analysis.
           </p>
         </div>
         <Button onClick={fetchRecommendations} disabled={isPending}>
@@ -94,10 +92,10 @@ function InventoryPageContent() {
               </Alert>
             ))
           ) : (
-             <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg">
-                <ShoppingCart className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold">No Recommendations Yet</h3>
-                <p className="mt-1 text-sm text-gray-500">The AI is analyzing your data. Check back soon or upload more inventory receipts.</p>
+             <div className="text-center py-16 px-4 border-2 border-dashed rounded-lg border-border">
+                <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-2 text-sm font-semibold">No Recommendations</h3>
+                <p className="mt-1 text-sm text-muted-foreground">The AI is analyzing your data. Check back soon.</p>
             </div>
           )}
         </div>

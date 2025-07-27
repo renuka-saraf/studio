@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -89,7 +88,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
 
   return (
     <>
-      <Card className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
+      <Card className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl bg-card">
         <CardHeader className="p-0">
           <div className="relative w-full h-48">
             <Image
@@ -113,10 +112,10 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
             {new Date(parseInt(receipt.id)).toLocaleString()}
           </p>
         </CardContent>
-        <CardFooter className="p-4 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row gap-2">
+        <CardFooter className="p-4 bg-secondary/50 flex flex-col sm:flex-row gap-2">
           <Button className="w-full" variant="outline" onClick={() => setIsSplitExpenseOpen(true)}>
             <SplitSquareHorizontal className="mr-2 h-4 w-4" />
-            Split Expense
+            Split
           </Button>
           {receipt.category === "grocery" && (
             <>
@@ -162,7 +161,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
               />
               <Button onClick={handleMealPlan} className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Generate Recommendations
+                Generate
               </Button>
             </div>
           )}
@@ -187,7 +186,7 @@ export function ReceiptCard({ receipt }: ReceiptCardProps) {
           {isLoading ? (
              <div className="flex justify-center items-center h-40">
                 <Loader2 className="h-8 w-8 animate-spin" />
-                <p className="ml-2">Checking availability...</p>
+                <p className="ml-2">Checking...</p>
             </div>
           ) : reorderResult && (
             <div className="p-4 bg-secondary rounded-md space-y-4">

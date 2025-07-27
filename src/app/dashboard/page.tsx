@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ExpenseDashboard } from '@/components/scanalyze/expense-dashboard';
@@ -10,9 +9,9 @@ export default function DashboardPage() {
     <ProtectedRoute>
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-headline">Expense Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight font-headline">Dashboard</h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            AI-powered insights into your spending habits.
+            AI-powered insights into your spending.
           </p>
         </div>
 
@@ -20,7 +19,7 @@ export default function DashboardPage() {
         
         <div className="relative my-8">
           <div className="absolute inset-0 flex items-center" aria-hidden="true">
-            <div className="w-full border-t" />
+            <div className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center">
             <span className="bg-background px-3 text-lg font-medium font-headline">
