@@ -41,15 +41,18 @@ const GstInfoSchema = z.object({
 });
 
 const CategorizeExpenseOutputSchema = z.object({
+  isReceipt: z.boolean().describe('Whether the uploaded image is a receipt or not.'),
   category: z
     .enum(['grocery', 'dining', 'fashion', 'travel', 'utilities', 'inventory purchasing', 'stationery', 'maintenance', 'other'])
+    .optional()
     .describe('The category of the expense.'),
   confidence: z
     .number()
+    .optional()
     .describe('The confidence level of the categorization (0-1).'),
-  amount: z.number().describe('The total amount of the expense.'),
-  currency: z.string().describe('The ISO 4217 currency code of the expense (e.g., USD, EUR).'),
-  items: z.array(ExpenseItemSchema).describe('A list of all individual items, their prices, and quantities found on the receipt.'),
+  amount: z.number().optional().describe('The total amount of the expense.'),
+  currency: z.string().optional().describe('The ISO 4217 currency code of the expense (e.g., USD, EUR).'),
+  items: z.array(ExpenseItemSchema).optional().describe('A list of all individual items, their prices, and quantities found on the receipt.'),
   gstInfo: GstInfoSchema.optional().describe('GST related information, if applicable for business use.'),
 });
 export type CategorizeExpenseOutput = z.infer<typeof CategorizeExpenseOutputSchema>;
@@ -63,6 +66,20 @@ const prompt = ai.definePrompt({
   input: {schema: CategorizeExpenseInputSchema},
   output: {schema: CategorizeExpenseOutputSchema},
   prompt: `You are an expert expense categorizer and data extractor with multi-lingual capabilities.
+
+Your primary task is to determine if the provided image is a receipt.
+
+1.  **Analyze the image and text.**
+2.  **IF** the image is a receipt (containing items, prices, a total, date, etc.):
+    *   Set 'isReceipt' to true.
+    *   Proceed with the data extraction and categorization logic below.
+3.  **ELSE** (if the image is not a receipt):
+    *   Set 'isReceipt' to false.
+    *   Do NOT fill any other fields. Return immediately.
+
+---
+
+**Data Extraction and Categorization Logic (ONLY if isReceipt is true):**
 
 You will be provided with the text and an image of a receipt, and a usage type ('personal' or 'business'). Your task is to extract all relevant details.
 

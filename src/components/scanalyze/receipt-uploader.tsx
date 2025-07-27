@@ -56,13 +56,25 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         receiptText: receiptText,
         usageType: usageType
       });
+
+      if (!result.isReceipt) {
+        toast({
+            variant: "destructive",
+            title: "Upload Error",
+            description: "The uploaded image does not appear to be a receipt. Please try another image.",
+        });
+        setIsProcessing(false);
+        setShowScanner(false);
+        setPreview(null);
+        return;
+      }
       
       const newReceiptForState: Omit<Receipt, 'id'> = {
         imageDataUri: dataUri,
         text: receiptText,
-        category: result.category,
-        amount: result.amount,
-        currency: result.currency,
+        category: result.category!,
+        amount: result.amount!,
+        currency: result.currency!,
         items: result.items || [],
         gstInfo: result.gstInfo,
       };
