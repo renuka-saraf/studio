@@ -1,13 +1,13 @@
 
 'use server';
 /**
- * @fileOverview A text extraction AI agent.
+ * @fileOverview A text extraction AI agent that uses Google Cloud Vision API.
  *
  * - extractText - A function that handles the text extraction process from an image.
  * - ExtractTextInput - The input type for the extractText function.
  * - ExtractTextOutput - The return type for the extractText function.
  */
-
+import {ImageAnnotatorClient} from '@google-cloud/vision';
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
@@ -29,27 +29,43 @@ export async function extractText(input: ExtractTextInput): Promise<ExtractTextO
   return extractTextFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'extractTextPrompt',
-  input: {schema: ExtractTextInputSchema},
-  output: {schema: ExtractTextOutputSchema},
-  prompt: `You are an expert at extracting text from images.
-
-You will be provided with an image. You must extract all text from the image.
-
-Image: {{media url=photoDataUri}}`,
-});
-
 const extractTextFlow = ai.defineFlow(
   {
     name: 'extractTextFlow',
     inputSchema: ExtractTextInputSchema,
     outputSchema: ExtractTextOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input: ExtractTextInput) => {
+    try {
+      // Create a client
+      const client = new ImageAnnotatorClient();
+
+      // Convert data URI to a buffer
+      const base64Data = input.photoDataUri.split(',')[1];
+      
+      const imageRequest = {
+        image: {
+          content: base64Data,
+        },
+      };
+
+      // Performs text detection on the image file
+      const [result] = await client.textDetection(imageRequest);
+      const detections = result.textAnnotations;
+      
+      if (detections && detections.length > 0 && detections[0].description) {
+        return {
+          extractedText: detections[0].description,
+        };
+      } else {
+        return {
+            extractedText: ""
+        }
+      }
+
+    } catch (error) {
+      console.error('GOOGLE_CLOUD_VISION_ERROR:', error);
+      throw new Error('Failed to process image with Cloud Vision API.');
+    }
   }
 );
-
-    
