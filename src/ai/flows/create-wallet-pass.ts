@@ -125,7 +125,7 @@ export async function createWalletPass(
     },
     heroImage: {
       sourceUri: {
-        uri: 'https://storage.googleapis.com/wallet-lab-tools-codelab-artifacts-public/pass_hero_image.jpg',
+        uri: 'https://placehold.co/1032x336.png',
       },
       contentDescription: {
         defaultValue: {
