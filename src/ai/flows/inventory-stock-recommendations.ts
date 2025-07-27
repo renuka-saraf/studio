@@ -22,7 +22,7 @@ const ReceiptHistorySchema = z.object({
   items: z.array(ReceiptItemSchema),
 });
 
-export const InventoryStockInputSchema = z.object({
+const InventoryStockInputSchema = z.object({
   receiptHistory: z
     .array(ReceiptHistorySchema)
     .describe(
@@ -37,7 +37,7 @@ const RecommendationSchema = z.object({
     suggestion: z.string().describe('A concrete suggestion, e.g., "Consider ordering 10 units."'),
 });
 
-export const InventoryStockOutputSchema = z.object({
+const InventoryStockOutputSchema = z.object({
   recommendations: z
     .array(RecommendationSchema)
     .describe(
