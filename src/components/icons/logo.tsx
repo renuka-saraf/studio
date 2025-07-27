@@ -31,10 +31,10 @@ export function ScanalyzLogo({
       </g>
       {/* Text */}
       <text
-        x="52"
+        x="48"
         y="32"
         fontFamily="Inter, sans-serif"
-        fontSize="24"
+        fontSize="22"
         fontWeight="bold"
       >
         <tspan fill="#4285F4">S</tspan>
