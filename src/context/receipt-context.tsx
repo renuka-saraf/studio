@@ -73,7 +73,8 @@ export function ReceiptProvider({ children }: { children: ReactNode }) {
   }
   
   const logout = () => {
-    // Keep userEmail, but clear usage type and data to go back to the selection screen
+    // This function now performs a full reset of the app state.
+    setUserEmail(null);
     setUsageTypeState(null);
     setReceipts([]);
     setDashboardAnalysis(null);
