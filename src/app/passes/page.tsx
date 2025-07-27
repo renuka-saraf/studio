@@ -1,7 +1,7 @@
-
+// src/app/passes/page.tsx
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useReceipts, Receipt } from '@/context/receipt-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -9,6 +9,8 @@ import { FileText, Utensils, Shirt, Plane, MoreHorizontal, Ticket, Wheat } from 
 import { Chatbot } from '@/components/scanalyze/chatbot';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProtectedRoute } from '@/components/layout/protected-route';
+import { Button } from '@/components/ui/button';
+import { createWalletPass } from '@/ai/flows/create-wallet-pass'; // Import the backend flow
 
 const categoryConfig: { [key: string]: { icon: JSX.Element; color: string; } } = {
   grocery: { icon: <Wheat className="h-6 w-6" />, color: "bg-green-500/10 text-green-700 dark:text-green-400" },
@@ -19,6 +21,7 @@ const categoryConfig: { [key: string]: { icon: JSX.Element; color: string; } } =
 };
 
 function PassCard({ receipt }: { receipt: Receipt }) {
+    const [isAddingToWallet, setIsAddingToWallet] = useState(false);
     const getFormattedAmount = () => {
         try {
           return new Intl.NumberFormat("en-US", {
@@ -34,9 +37,24 @@ function PassCard({ receipt }: { receipt: Receipt }) {
           }).format(receipt.amount).replace("USD", receipt.currency || "");
         }
     };
+
+    const handleAddToWallet = async () => {
+        setIsAddingToWallet(true);
+        try {
+            // Call the server-side flow to create the pass
+            const { walletUrl } = await createWalletPass({ receipt });
+            // Open the generated URL to let the user save the pass
+            window.open(walletUrl, '_blank');
+        } catch (error) {
+            console.error('Error creating wallet pass:', error);
+            // You can add user-facing error handling here, e.g., a toast notification
+        } finally {
+            setIsAddingToWallet(false);
+        }
+    };
+
     const formattedAmount = getFormattedAmount();
     const config = categoryConfig[receipt.category] || categoryConfig.other;
-
     const summary = receipt.text.split('\n').slice(0, 2).join(' / ');
 
     return (
@@ -52,9 +70,14 @@ function PassCard({ receipt }: { receipt: Receipt }) {
                     </div>
                     <p className="text-lg font-bold flex-shrink-0 ml-4">{formattedAmount}</p>
                 </div>
-                <p className="text-sm text-right mt-2">
-                    {new Date(parseInt(receipt.id)).toLocaleString()}
-                </p>
+                 <div className="flex justify-between items-center mt-2">
+                    <p className="text-sm">
+                        {new Date(parseInt(receipt.id)).toLocaleString()}
+                    </p>
+                    <Button onClick={handleAddToWallet} disabled={isAddingToWallet} size="sm">
+                        {isAddingToWallet ? 'Adding...' : 'Add to Google Wallet'}
+                    </Button>
+                </div>
             </div>
         </div>
     );
@@ -74,7 +97,6 @@ function PassesPageContent() {
       return acc;
     }, {} as { [key: string]: { receipts: Receipt[], total: number, currency: string } });
 
-    // Sort categories by total amount descending
     return Object.entries(data)
       .sort(([, a], [, b]) => b.total - a.total)
       .reduce((acc, [key, value]) => {
