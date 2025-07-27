@@ -6,7 +6,7 @@ import { ReceiptProvider } from '@/context/receipt-context';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Scanalyze',
+  title: 'Scanalyz',
   description: 'AI-Powered Expense Analysis',
 };
 

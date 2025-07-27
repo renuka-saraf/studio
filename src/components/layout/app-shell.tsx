@@ -33,7 +33,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useReceipts } from '@/context/receipt-context';
-import { ScanalyzeLogo } from '../icons/logo';
+import { ScanalyzLogo } from '../icons/logo';
 import { ModeToggle } from './mode-toggle';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -68,11 +68,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-2 flex-1">
                         <Button variant="ghost" size="icon" asChild>
                             <Link href="/">
-                                <ScanalyzeLogo className="h-8 w-8" />
-                                <span className="sr-only">Scanalyze</span>
+                                <ScanalyzLogo className="h-8 w-8" />
+                                <span className="sr-only">Scanalyz</span>
                             </Link>
                         </Button>
-                        <h1 className="text-xl font-semibold tracking-tight font-headline">Scanalyze</h1>
+                        <h1 className="text-xl font-semibold tracking-tight font-headline">Scanalyz</h1>
                     </div>
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="icon">
@@ -106,11 +106,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon" asChild>
                         <Link href="/">
-                            <ScanalyzeLogo className="h-8 w-8" />
-                            <span className="sr-only">Scanalyze</span>
+                            <ScanalyzLogo className="h-8 w-8" />
+                            <span className="sr-only">Scanalyz</span>
                         </Link>
                     </Button>
-                    <h1 className="text-xl font-semibold tracking-tight font-headline">Scanalyze</h1>
+                    <h1 className="text-xl font-semibold tracking-tight font-headline">Scanalyz</h1>
                 </div>
             </SidebarHeader>
           )}

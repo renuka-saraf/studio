@@ -135,7 +135,7 @@ export async function createWalletPass(
     cardTitle: {
       defaultValue: {
         language: 'en',
-        value: 'Scanalyze Receipt',
+        value: 'Scanalyz Receipt',
       },
     },
     header: {

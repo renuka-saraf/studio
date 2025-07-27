@@ -1,15 +1,15 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 
-export function ScanalyzeLogo({
+export function ScanalyzLogo({
   className,
   ...props
 }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      width="160"
+      width="150"
       height="48"
-      viewBox="0 0 160 48"
+      viewBox="0 0 150 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn(className)}
@@ -42,10 +42,9 @@ export function ScanalyzeLogo({
         <tspan fill="#FBBC05">a</tspan>
         <tspan fill="#34A853">n</tspan>
         <tspan fill="#4285F4">a</tspan>
-        <tspan fill="#EA4335">l</tspan>
-        <tspan fill="#FBBC05">y</tspan>
-        <tspan fill="#34A853">z</tspan>
-        <tspan fill="#4285F4">e</tspan>
+        <tspan fill="#FBBC05">l</tspan>
+        <tspan fill="#34A853">y</tspan>
+        <tspan fill="#4285F4">z</tspan>
       </text>
       <defs>
         <clipPath id="clip0_101_2">

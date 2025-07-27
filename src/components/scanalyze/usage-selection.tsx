@@ -3,7 +3,7 @@
 import { useReceipts } from '@/context/receipt-context';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building, User, LogOut } from 'lucide-react';
-import { ScanalyzeLogo } from '../icons/logo';
+import { ScanalyzLogo } from '../icons/logo';
 import { Button } from '../ui/button';
 
 export function UsageSelection() {
@@ -12,10 +12,10 @@ export function UsageSelection() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
       <div className="w-full max-w-2xl text-center">
-        <ScanalyzeLogo className="h-24 w-auto mx-auto mb-4" />
+        <ScanalyzLogo className="h-24 w-auto mx-auto mb-4" />
         <h1 className="text-3xl font-bold tracking-tight">Welcome, {userEmail}!</h1>
         <p className="mt-2 text-lg text-muted-foreground">
-          How are you using Scanalyze today?
+          How are you using Scanalyz today?
         </p>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
