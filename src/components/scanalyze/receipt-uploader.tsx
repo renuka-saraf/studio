@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { useRouter } from 'next/navigation';
 
 interface ReceiptUploaderProps {
   isProcessing: boolean;
@@ -22,6 +23,7 @@ interface ReceiptUploaderProps {
 export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUploaderProps) {
   const { addReceipt, userEmail, usageType } = useReceipts();
   const { toast } = useToast();
+  const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
@@ -82,9 +84,12 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
       addReceipt(newReceiptForState);
 
       toast({
-        title: "Receipt Categorized!",
-        description: `Expense added to '${result.category}' with ${Math.round((result.confidence || 0) * 100)}% confidence.`,
+        title: "Receipt Processed!",
+        description: `Expense categorized as '${result.category}'. Now redirecting to passes...`,
       });
+
+      // Redirect to passes page
+      router.push('/passes');
       
     } catch (error) {
       console.error("Categorization failed:", error);
@@ -94,6 +99,7 @@ export function ReceiptUploader({ isProcessing, setIsProcessing }: ReceiptUpload
         description: "Failed to categorize the receipt. Please try again.",
       });
     } finally {
+      // Reset state, though redirection will unmount this component soon
       setIsProcessing(false);
       setShowScanner(false);
       setPreview(null);

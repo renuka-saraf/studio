@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useReceipts } from '@/context/receipt-context';
 import { ReceiptUploader } from '@/components/scanalyze/receipt-uploader';
-import { ReceiptList } from '@/components/scanalyze/receipt-list';
 import { EmailAuth } from '@/components/scanalyze/email-auth';
 import { UsageSelection } from '@/components/scanalyze/usage-selection';
+import { Button } from '@/components/ui/button';
+import { Ticket } from 'lucide-react';
 
 export default function HomePage() {
-  const { userEmail, usageType } = useReceipts();
+  const { userEmail, usageType, receipts } = useReceipts();
   const [isProcessing, setIsProcessing] = useState(false);
+  const router = useRouter();
 
   if (!userEmail) {
     return <EmailAuth />;
@@ -26,26 +29,20 @@ export default function HomePage() {
           Scan & Analyze
         </h1>
         <p className="mt-2 text-lg text-muted-foreground">
-          Upload a receipt to automatically categorize and understand your spending.
+          Upload a receipt to automatically categorize and store it as a digital pass.
         </p>
       </header>
       
       <ReceiptUploader isProcessing={isProcessing} setIsProcessing={setIsProcessing} />
       
-      <div className="my-12">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center" aria-hidden="true">
-            <div className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-background px-3 text-lg font-medium text-foreground font-headline">
-              Your Receipts
-            </span>
-          </div>
+      {receipts.length > 0 && (
+         <div className="mt-12 text-center">
+            <Button size="lg" onClick={() => router.push('/passes')}>
+                <Ticket className="mr-2 h-5 w-5" />
+                View Your Passes ({receipts.length})
+            </Button>
         </div>
-      </div>
-      
-      <ReceiptList isProcessing={isProcessing} />
+      )}
     </div>
   );
 }
