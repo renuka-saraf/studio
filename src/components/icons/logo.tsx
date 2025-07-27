@@ -44,7 +44,7 @@ export function ScanalyzLogo({
         <tspan fill="#4285F4">a</tspan>
         <tspan fill="#FBBC05">l</tspan>
         <tspan fill="#34A853">y</tspan>
-        <tspan fill="#4285F4">z</tspan>
+        <tspan fill="#EA4335">z</tspan>
       </text>
       <defs>
         <clipPath id="clip0_101_2">
