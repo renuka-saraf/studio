@@ -56,13 +56,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const menuItems = usageType === 'business' ? [...baseMenuItems, ...businessMenuItems] : baseMenuItems;
 
-  const isAuthenticated = !!userEmail;
+  const isFullyAuthenticated = !!userEmail && !!usageType;
 
   return (
     <SidebarProvider>
       <Sidebar>
         <SidebarContent>
-          {isAuthenticated ? (
+          {isFullyAuthenticated ? (
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
               <SidebarHeader>
                 <div className="flex items-center justify-between">
@@ -116,7 +116,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </SidebarHeader>
           )}
         </SidebarContent>
-        {isAuthenticated && (
+        {isFullyAuthenticated && (
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
