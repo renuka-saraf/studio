@@ -96,7 +96,9 @@ export function Chatbot() {
           category: r.category,
           amount: r.amount,
           currency: r.currency,
-          items: r.text.split('\n').slice(0, 10).join(', ') // A summary of items
+          items: r.items, // Pass full items list
+          gstInfo: r.gstInfo, // Pass full GST info
+          text: r.text.substring(0, 300) + '...' // Pass a snippet of raw text
         })));
         
         if (!receipts || receipts.length === 0) {
